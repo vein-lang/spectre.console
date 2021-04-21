@@ -19,7 +19,7 @@
         <script src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-core.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/plugins/autoloader/prism-autoloader.min.js" data-no-mirror></script>
 
-        <title>Spectre.Console - Live Displays</title>
+        <title>Spectre.Console - CommandApp</title>
     </head>
     <body class="d-flex flex-column">
         <div class="flex-grow-1 d-flex flex-column">
@@ -52,7 +52,7 @@
                             <div class="row">
                                 <div class="offset-md-3 offset-lg-2 px-3 px-md-0">
                                     <div class="section text-uppercase">Spectre.Console</div>
-                                    <div class="text-white m-0 title">Live Displays</div>
+                                    <div class="text-white m-0 title">CommandApp</div>
                                 </div>
                             </div>
                         </div>
@@ -84,9 +84,9 @@
 <a href="/markup">Markup</a>                                                </div>
                                                 <div class="sidebar-nav-item">
 <a href="/exceptions">Exceptions</a>                                                </div>
-                                                <div class="sidebar-nav-item active has-children">
+                                                <div class="sidebar-nav-item has-children">
 <a href="/live">Live Displays</a>                                                </div>
-                                                    <div class="sidebar-nav-children active">
+                                                    <div class="sidebar-nav-children">
                                                             <div class="sidebar-nav-child">
                                                                 <a href="/live/progress">Progress</a>
                                                             </div>
@@ -137,11 +137,11 @@
                                                     </div>
                                                 <div class="sidebar-nav-item has-children">
 <a href="/cli">CLI</a>                                                </div>
-                                                    <div class="sidebar-nav-children">
+                                                    <div class="sidebar-nav-children active">
                                                             <div class="sidebar-nav-child">
                                                                 <a href="/cli/getting-started">Getting Started</a>
                                                             </div>
-                                                            <div class="sidebar-nav-child">
+                                                            <div class="sidebar-nav-child active">
                                                                 <a href="/cli/commandapp">CommandApp</a>
                                                             </div>
                                                             <div class="sidebar-nav-child">
@@ -178,16 +178,72 @@
                                                     </div>
                                     </div>
                                     <div class="col-md-9 col-lg-8 pt-4 pt-md-0 pb-4 px-4">
-                                        
-<h1>Sections</h1>
+                                        <p><code>CommandApp</code> is the entry point for a <code>Spectre.Console.Cli</code> command line application. It is used to configure the settings and commands used for execution of the application. Most <code>Spectre.Console.Cli</code> applications will need to specify a custom configuration using the <code>Configure</code> method.</p>
+<p>For example, the following configuration might be used to change the default behavior indicate that for <code>DEBUG</code> configuration's full exception stack traces should be outputted to the screen, and any examples defined for our commands will also be validated.</p>
+<pre><code class="language-csharp">var app = new CommandApp&lt;FileSizeCommand&gt;();
+app.Configure(config =&gt;
+{
+#if DEBUG
+    config.PropagateExceptions();
+    config.ValidateExamples();
+#endif
+});
+</code></pre>
+<h1 id="multiple-commands">Multiple Commands</h1>
+<p>In the previous example we have a single command that is configured. For complex command line applications, it is common for them to have multiple commands (or verbs) defined. Examples of applications like this are <code>git</code>, <code>dotnet</code> and <code>gh</code>. For example, git would have an <code>commit</code> command and along with other commits like <code>add</code> or <code>rebase</code>. Each with their own settings and validation. With <code>Spectre.Console.Cli</code> we use the <code>Configure</code> method to add these commands.</p>
+<p>For example, to add three different commands to the application:</p>
+<pre><code class="language-csharp">var app = new CommandApp();
+app.Configure(config =&gt;
+{
+    config.AddCommand&lt;AddCommand&gt;(&quot;add&quot;);
+    config.AddCommand&lt;CommitCommand&gt;(&quot;commit&quot;);
+    config.AddCommand&lt;RebaseCommand&gt;(&quot;rebase&quot;);
+});
+</code></pre>
+<p>This configuration would allow users to run <code>app.exe add</code>, <code>app.exe commit</code>, or <code>app.exe rebase</code> and have the settings routed the appropriate command.</p>
+<p>For more complex command hierarchical configurations, they can also be composed via inheritance and branching. See <a href="./composing">Composing Commands</a>.</p>
+<h1 id="customizing-command-configurations">Customizing Command Configurations</h1>
+<p>The <code>Configure</code> method is also used to change how help for the commands is generated. This configuration will give our command an additional alias of <code>file-size</code> and a description to be used when displaying the help. Additional, an example is specified that will be parsed and displayed for users asking for help. Multiple examples can be provided. Commands can also be marked as hidden. With this option they are still executable, but will not be displayed in help screens.</p>
+<pre><code class="language-csharp">var app = new CommandApp();
+app.Configure(config =&gt;
+{
+    config.AddCommand&lt;FileSizeCommand&gt;(&quot;size&quot;)
+        .IsHidden()
+        .WithAlias(&quot;file-size&quot;)
+        .WithDescription(&quot;Gets the file size for a directory.&quot;)
+        .WithExample(new[] {&quot;c:\\windows&quot;, &quot;--pattern&quot;, &quot;*.dll&quot;});
+});
+</code></pre>
+<h1 id="dependency-injection">Dependency Injection</h1>
+<p><code>CommandApp</code> takes care of instantiating commands upon execution. If given a custom type registrar, it will use that to resolve services defined in the command constructor.</p>
+<pre><code class="language-csharp">var registrations = new ServiceCollection();
+registrations.AddSingleton&lt;IGreeter, HelloWorldGreeter&gt;();
 
-<ul>
-  <li><a href="/live/progress">Progress</a></li>
-  <li><a href="/live/status">Status</a></li>
-</ul>
+// Create a type registrar and register any dependencies.
+// A type registrar is an adapter for a DI framework.
+var registrar = new TypeRegistrar(registrations);
+
+// Create a new command app with the registrar
+// and run it with the provided arguments.
+var app = new CommandApp&lt;DefaultCommand&gt;(registrar);
+return app.Run(args);
+</code></pre>
+<p><code>TypeRegistrar</code> is a custom class that must be created by the user. This <a href="https://github.com/spectreconsole/spectre.console/tree/main/examples/Cli/Injection">example using <code>Microsoft.Extensions.DependencyInjection</code> as the container</a> provides an example <code>TypeRegistrar</code> and <code>TypeResolver</code> that can be added to your application with small adjustments for your DI container.</p>
+<h1 id="interception">Interception</h1>
+<p><code>CommandApp</code> also provides a <code>SetInterceptor</code> configuration. An interceptor is ran before all commands are executed. This is typically used for configuring logging or other infrastructure concerns.</p>
+<p>All interceptors must implement <code>ICommandInterceptor</code>. Upon execution of a command, an instance of your interceptor will be called with the parsed settings. This provides an opportunity for configuring any infrastructure or modifying the settings.</p>
+<p>For an example of using the interceptor to configure logging, see the <a href="https://github.com/spectreconsole/spectre.console/tree/main/examples/Cli/Logging">Serilog demo</a>.</p>
+
                                     </div>
                                 <div class="col-lg-2 d-none d-lg-block bg-body pl-3 pt-3">
-                                        <p class="small font-weight-bold"><a href="https://github.com/spectreconsole/spectre.console/edit/main/docs/input/live/index.cshtml"><i class="fad fa-pencil"></i> Edit This Page</a></p>
+                                            <div class="border-bottom mb-3">
+                                                <p class="small font-weight-bold">On This Page</p>
+                                                    <p class="small"><a href="#multiple-commands">Multiple Commands</a></p>
+                                                    <p class="small"><a href="#customizing-command-configurations">Customizing Command Configurations</a></p>
+                                                    <p class="small"><a href="#dependency-injection">Dependency Injection</a></p>
+                                                    <p class="small"><a href="#interception">Interception</a></p>
+                                            </div>
+                                        <p class="small font-weight-bold"><a href="https://github.com/spectreconsole/spectre.console/edit/main/docs/input/cli/commandApp.md"><i class="fad fa-pencil"></i> Edit This Page</a></p>
                                 </div>
                             </div>
                         </div>

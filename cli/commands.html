@@ -19,7 +19,7 @@
         <script src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-core.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/plugins/autoloader/prism-autoloader.min.js" data-no-mirror></script>
 
-        <title>Spectre.Console - Live Displays</title>
+        <title>Spectre.Console - Creating Commands</title>
     </head>
     <body class="d-flex flex-column">
         <div class="flex-grow-1 d-flex flex-column">
@@ -52,7 +52,7 @@
                             <div class="row">
                                 <div class="offset-md-3 offset-lg-2 px-3 px-md-0">
                                     <div class="section text-uppercase">Spectre.Console</div>
-                                    <div class="text-white m-0 title">Live Displays</div>
+                                    <div class="text-white m-0 title">Creating Commands</div>
                                 </div>
                             </div>
                         </div>
@@ -84,9 +84,9 @@
 <a href="/markup">Markup</a>                                                </div>
                                                 <div class="sidebar-nav-item">
 <a href="/exceptions">Exceptions</a>                                                </div>
-                                                <div class="sidebar-nav-item active has-children">
+                                                <div class="sidebar-nav-item has-children">
 <a href="/live">Live Displays</a>                                                </div>
-                                                    <div class="sidebar-nav-children active">
+                                                    <div class="sidebar-nav-children">
                                                             <div class="sidebar-nav-child">
                                                                 <a href="/live/progress">Progress</a>
                                                             </div>
@@ -137,7 +137,7 @@
                                                     </div>
                                                 <div class="sidebar-nav-item has-children">
 <a href="/cli">CLI</a>                                                </div>
-                                                    <div class="sidebar-nav-children">
+                                                    <div class="sidebar-nav-children active">
                                                             <div class="sidebar-nav-child">
                                                                 <a href="/cli/getting-started">Getting Started</a>
                                                             </div>
@@ -147,7 +147,7 @@
                                                             <div class="sidebar-nav-child">
                                                                 <a href="/cli/settings">Specifying Settings</a>
                                                             </div>
-                                                            <div class="sidebar-nav-child">
+                                                            <div class="sidebar-nav-child active">
                                                                 <a href="/cli/commands">Creating Commands</a>
                                                             </div>
                                                             <div class="sidebar-nav-child">
@@ -178,16 +178,64 @@
                                                     </div>
                                     </div>
                                     <div class="col-md-9 col-lg-8 pt-4 pt-md-0 pb-4 px-4">
-                                        
-<h1>Sections</h1>
+                                        <p>Commands in <code>Spectre.Console.Cli</code> are defined by creating a class that inherits from either <code>Spectre.Console.Cli.Command&lt;TSettings&gt;</code> or <code>Spectre.Console.Cli.AsyncCommand&lt;TSettings&gt;</code>. <code>Command&lt;TSettings&gt;</code> must implement an <code>Execute</code> method that returns an int where as <code>AsyncCommand&lt;TSettings&gt;</code> must implement <code>ExecuteAsync</code>  returning <code>Task&lt;int&gt;</code>.</p>
+<pre><code class="language-csharp">public class HelloCommand : Command&lt;HelloCommand.Settings&gt;
+{
+    public class Settings : LogCommandSettings
+    {
+        [CommandArgument(0, &quot;[Name]&quot;)]
+        public string Name { get; set; }
+    }
 
+
+    public override int Execute(CommandContext context, Settings settings)
+    {
+        AnsiConsole.MarkupLine($&quot;Hello, [blue]{settings.Name}[/]&quot;);
+        return 0;
+    }
+}
+</code></pre>
+<h1 id="configuring">Configuring.</h1>
+<p>Commands are configured via the <a href="commandApp"><code>CommandApp</code></a>'s <code>Configure</code> method.</p>
+<pre><code class="language-csharp">var app = new CommandApp();
+app.Configure(config =&gt;
+{
+    config.AddCommand&lt;HelloCommand&gt;(&quot;hello&quot;)
+        .WithAlias(&quot;hola&quot;)
+        .WithDescription(&quot;Say hello&quot;)
+        .WithExample(new []{&quot;hello&quot;, &quot;Phil&quot;})
+        .WithExample(new []{&quot;hello&quot;, &quot;Phil&quot;, &quot;--count&quot;, &quot;4&quot;});
+});
+</code></pre>
 <ul>
-  <li><a href="/live/progress">Progress</a></li>
-  <li><a href="/live/status">Status</a></li>
+<li><code>WithAlias</code> allows commands to have multiple names.</li>
+<li><code>WithDescription</code> is used by the help renderer to give commands a description when displaying help.</li>
+<li><code>WithExample</code> is used by the help renderer to provide examples to the user for running the commands. The parameters is a string array that matches the values passed in <code>Main(string[] args)</code>.</li>
 </ul>
+<h1 id="dependency-injection">Dependency Injection.</h1>
+<p>Constructor injection is supported on commands. See the <a href="commandApp"><code>CommandApp</code></a> documentation for further information on configuring <code>Spectre.Console</code> for your container.</p>
+<h1 id="validation">Validation.</h1>
+<p>While the settings can validate themselves, the command also provides a validation. For example, <code>IFileSystem</code> might be injected into the command which we want to use to validate that a path passed in exists.</p>
+<pre><code class="language-csharp">public override ValidationResult Validate(CommandContext context, Settings settings)
+{
+    if (_fileSystem.IO.File.Exists(settings.Path))
+    {
+        return ValidationResult.Error($&quot;Path not found - {settings.Path}&quot;);
+    }
+
+    return base.Validate(context, settings);
+}
+</code></pre>
+
                                     </div>
                                 <div class="col-lg-2 d-none d-lg-block bg-body pl-3 pt-3">
-                                        <p class="small font-weight-bold"><a href="https://github.com/spectreconsole/spectre.console/edit/main/docs/input/live/index.cshtml"><i class="fad fa-pencil"></i> Edit This Page</a></p>
+                                            <div class="border-bottom mb-3">
+                                                <p class="small font-weight-bold">On This Page</p>
+                                                    <p class="small"><a href="#configuring">Configuring.</a></p>
+                                                    <p class="small"><a href="#dependency-injection">Dependency Injection.</a></p>
+                                                    <p class="small"><a href="#validation">Validation.</a></p>
+                                            </div>
+                                        <p class="small font-weight-bold"><a href="https://github.com/spectreconsole/spectre.console/edit/main/docs/input/cli/commands.md"><i class="fad fa-pencil"></i> Edit This Page</a></p>
                                 </div>
                             </div>
                         </div>

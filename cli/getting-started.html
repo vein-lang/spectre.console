@@ -19,7 +19,7 @@
         <script src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-core.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/plugins/autoloader/prism-autoloader.min.js" data-no-mirror></script>
 
-        <title>Spectre.Console - Live Displays</title>
+        <title>Spectre.Console - Getting Started</title>
     </head>
     <body class="d-flex flex-column">
         <div class="flex-grow-1 d-flex flex-column">
@@ -52,7 +52,7 @@
                             <div class="row">
                                 <div class="offset-md-3 offset-lg-2 px-3 px-md-0">
                                     <div class="section text-uppercase">Spectre.Console</div>
-                                    <div class="text-white m-0 title">Live Displays</div>
+                                    <div class="text-white m-0 title">Getting Started</div>
                                 </div>
                             </div>
                         </div>
@@ -84,9 +84,9 @@
 <a href="/markup">Markup</a>                                                </div>
                                                 <div class="sidebar-nav-item">
 <a href="/exceptions">Exceptions</a>                                                </div>
-                                                <div class="sidebar-nav-item active has-children">
+                                                <div class="sidebar-nav-item has-children">
 <a href="/live">Live Displays</a>                                                </div>
-                                                    <div class="sidebar-nav-children active">
+                                                    <div class="sidebar-nav-children">
                                                             <div class="sidebar-nav-child">
                                                                 <a href="/live/progress">Progress</a>
                                                             </div>
@@ -137,8 +137,8 @@
                                                     </div>
                                                 <div class="sidebar-nav-item has-children">
 <a href="/cli">CLI</a>                                                </div>
-                                                    <div class="sidebar-nav-children">
-                                                            <div class="sidebar-nav-child">
+                                                    <div class="sidebar-nav-children active">
+                                                            <div class="sidebar-nav-child active">
                                                                 <a href="/cli/getting-started">Getting Started</a>
                                                             </div>
                                                             <div class="sidebar-nav-child">
@@ -178,16 +178,90 @@
                                                     </div>
                                     </div>
                                     <div class="col-md-9 col-lg-8 pt-4 pt-md-0 pb-4 px-4">
-                                        
-<h1>Sections</h1>
+                                        <p><code>Spectre.Console.Cli</code> is a modern library for parsing command line arguments. While it's extremely
+opinionated in what it does, it tries to follow established industry conventions, and draws
+its inspiration from applications you use everyday.</p>
+<h1 id="how-does-it-work">How does it work?</h1>
+<p>A <code>Spectre.Console.Cli</code> app will be comprised of Commands and a matching Setting specification. The settings file will be the model for the command parameters. Upon execution, <code>Spectre.Console.Cli</code> will parse the <code>args[]</code> passed into your application and match them to the appropriate settings file giving you a strongly typed object to work with.</p>
+<p>The following example demonstrates these concepts coming together.</p>
+<pre><code class="language-csharp">using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using Spectre.Console;
+using Spectre.Console.Cli;
 
+var app = new CommandApp&lt;FileSizeCommand&gt;();
+return app.Run(args);
+
+internal sealed class FileSizeCommand : Command&lt;FileSizeCommand.Settings&gt;
+{
+    public sealed class Settings : CommandSettings
+    {
+        [Description(&quot;Path to search. Defaults to current directory.&quot;)]
+        [CommandArgument(0, &quot;[searchPath]&quot;)]
+        public string? SearchPath { get; init; }
+
+        [CommandOption(&quot;-p|--pattern&quot;)]
+        public string? SearchPattern { get; init; }
+
+        [CommandOption(&quot;--hidden&quot;)]
+        [DefaultValue(true)]
+        public bool IncludeHidden { get; init; }
+    }
+
+    public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings)
+    {
+        var searchOptions = new EnumerationOptions
+        {
+            AttributesToSkip = settings.IncludeHidden
+                ? FileAttributes.Hidden | FileAttributes.System
+                : FileAttributes.System
+        };
+
+        var searchPattern = settings.SearchPattern ?? &quot;*.*&quot;;
+        var searchPath = settings.SearchPath ?? Directory.GetCurrentDirectory();
+        var files = new DirectoryInfo(searchPath)
+            .GetFiles(searchPattern, searchOptions);
+
+        var totalFileSize = files
+            .Sum(fileInfo =&gt; fileInfo.Length);
+
+        AnsiConsole.MarkupLine(
+            $&quot;Total file size for [green]{searchPattern}[/] files in [green]{searchPath}[/]: [blue]{totalFileSize:N0}[/] bytes&quot;);
+
+        return 0;
+    }
+}
+</code></pre>
+<p>In our <code>Main()</code> method, an instance of <code>Spectre.Console.Cli</code>'s  <code>CommandApp</code> is instantiated specifying <code>FileSizeCommand</code> will be the app's default and only command. <code>FileSizeCommand</code> is defined as inheriting from <code>Spectre.Console.Cli</code>'s generic <code>Command</code> class specifying the settings for the command are <code>FileSizeCommand.Settings</code>. The settings are defined  using a nested class, but they can exist anywhere in the project as long as they inherit from <code>CommandSettings</code>.</p>
+<p>This command will have three parameters.</p>
 <ul>
-  <li><a href="/live/progress">Progress</a></li>
-  <li><a href="/live/status">Status</a></li>
+<li>The main parameter for the command will be the path. This is to be passed in as the first argument without needing to specify any command line flags. To configure that setting, use the <code>CommandArgument</code> attribute. The <code>[searchPath]</code> parameters of <code>CommandArgument</code> drives not only how the built in help display will render the help text, but the square brackets tells <code>Spectre.Console.Cli</code> that this argument is optional through convention.</li>
+<li>The second will be specified as a parameter option. The <code>CommandOption</code> attribute is used to specify this action along with the option command line flag. In the case of <code>SearchPattern</code> both <code>-p</code> and <code>--path</code> are valid.</li>
+<li>The third will also be a parameter option. Here <code>DefaultValue</code> is used to indicate the default value will be <code>true</code>. For boolean parameters these will be interpreted as flags which means the user can just specify <code>--hidden</code> rather than <code>-hidden true</code>.</li>
 </ul>
+<p>When <code>args</code> is passed into the <code>CommandApp</code>'s run method, <code>Spectre.Console.Cli</code> will parse those arguments and populate an instance of your settings. Upon success, it will then pass those settings into an instance of the specified command's <code>Execute</code> method.</p>
+<p>With this in place, we can the following commands will all work</p>
+<pre><code class="language-text">app.exe
+app.exe c:\windows
+app.exe c:\windows --pattern *.dll
+app.exe c:\windows --hidden --pattern *.dll
+</code></pre>
+<p>Much more is possible. You can have multiple commands per application, settings can be customized and extended and the default behavior of the <code>CommandApp</code> can be extended and customized.</p>
+<ul>
+<li>See <a href="./commandApp">CommandApp</a> for customizing how Spectre.Console.Cli builds the settings.</li>
+<li>See <a href="./commands">Create Commands</a> for information about different command types and their configurations.</li>
+<li>See <a href="./settings">Specifying Settings</a> for information about defining the settings.</li>
+</ul>
+
                                     </div>
                                 <div class="col-lg-2 d-none d-lg-block bg-body pl-3 pt-3">
-                                        <p class="small font-weight-bold"><a href="https://github.com/spectreconsole/spectre.console/edit/main/docs/input/live/index.cshtml"><i class="fad fa-pencil"></i> Edit This Page</a></p>
+                                            <div class="border-bottom mb-3">
+                                                <p class="small font-weight-bold">On This Page</p>
+                                                    <p class="small"><a href="#how-does-it-work">How does it work?</a></p>
+                                            </div>
+                                        <p class="small font-weight-bold"><a href="https://github.com/spectreconsole/spectre.console/edit/main/docs/input/cli/getting-started.md"><i class="fad fa-pencil"></i> Edit This Page</a></p>
                                 </div>
                             </div>
                         </div>
