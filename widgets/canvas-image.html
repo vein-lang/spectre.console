@@ -1,189 +1,169 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link href="/assets/bootstrap/bootstrap.css" rel="stylesheet" />
-        <link href="/assets/css/styles.css" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto+Slab:wght@400;700&family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet" data-no-mirror>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css">
+        <link href="/assets/styles.css" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet" />
 
-        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-        <script src="https://kit.fontawesome.com/a1cad7ed9a.js" crossorigin="anonymous" data-no-mirror></script>
-        <script src="https://cdn.jsdelivr.net/npm/mermaid@8.4.8/dist/mermaid.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-core.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/plugins/autoloader/prism-autoloader.min.js" data-no-mirror></script>
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png">
 
         <title>Spectre.Console - Canvas Image</title>
+        <meta name="description" content="Spectre.Console is a .NET Standard 2.0 library that makes it easier to create beautiful console applications" />
     </head>
-    <body class="d-flex flex-column">
-        <div class="flex-grow-1 d-flex flex-column">
-
-            <nav id="topnav" class="navbar navbar-expand-lg navbar-light">
-                <div class="container py-3">
-                    <a class="navbar-brand" href="/"><img id="logo" src="/assets/logo.svg" alt="Spectre.Console"> Spectre.Console</a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarText">
-                        <ul class="navbar-nav mr-auto">
-                        </ul>
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link font-weight-light font-size-lg text-red" href="https://github.com/sponsors/patriksvensson"><i class="far fa-heart"></i> Sponsor</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link font-weight-light font-size-lg" href="https://github.com/spectreconsole/spectre.console"><i class="fab fa-github"></i> GitHub</a>
-                            </li>
-                        </ul>
-                    </div>
+    <body class="antialiased text-gray-600 min-h-full flex flex-col  bg-gray-50">
+        <header class="flex-none text-sm font-medium bg-gradient-to-b from-gray-200 to-gray-100 ring-1 ring-gray-900 ring-opacity-5 shadow py-2 md:py-4">
+            <nav class="flex flex-row container mx-auto items-center">
+                <a class="flex flex-row  items-center" href="/">
+                    <img id="logo" class="w-auto h-10 md:h-12" height="48" width="48" src="/assets/logo.svg" alt="Spectre.Console">
+                    <span class="text-lg md:text-2xl font-light ml-2 lg:ml-4 font-mono tracking-tighter">Spectre.Console</span>
+                </a>
+                <div class="ml-auto">
+                    <ul class="flex flex-row">
+                        <li>
+                            <a class="flex flex-row items-center text-red-700" href="https://github.com/sponsors/patriksvensson">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <title>Sponsor</title>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                <span class="hidden sm:block">Sponsor</span>
+                            </a>
+                        </li>
+                        <li class="ml-4">
+                            <a class="flex flex-row items-center text-gray-600" href="https://github.com/spectreconsole/spectre.console">
+                                <svg role="img" class="h-6 w-6 mr-2"  stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <title>GitHub icon</title>
+                                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                                <span class="hidden sm:block">GitHub</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </nav>
-
-
-            <div class="flex-grow-1 d-flex  bg-body flex-column section-docs">
-                    <div id="titlebar" class="py-4">
-                        <div class="container">
-                            <div class="row">
-                                <div class="offset-md-3 offset-lg-2 px-3 px-md-0">
-                                    <div class="section text-uppercase">Spectre.Console</div>
-                                    <div class="text-white m-0 title">Canvas Image</div>
-                                </div>
+        </header>
+        <main class="container mx-auto pt-4 md:pt-8 w-full">
+            <div class="flex flex-col-reverse lg:flex-row">
+                <nav class="flex-none font-light text-sm xl:text-base sm:mr-16 mt-8 pt-6 lg:mt-0 lg:pt-0 border-t border-gray-300 lg:border-t-0">
+                    <div class="text-xl">
+<a href="/">Welcome</a>                    </div>
+                        <div class="text-blue-700 mt-4">
+<a href="/sponsors">Sponsors</a>                        </div>
+                        <div class="text-blue-700 mt-4">
+<a href="/quick-start">Quick Start</a>                        </div>
+                        <div class="text-blue-700 mt-4">
+<a href="/markup">Markup</a>                        </div>
+                        <div class="text-blue-700 mt-4">
+<a href="/exceptions">Exceptions</a>                        </div>
+                        <div class="text-blue-700 mt-4">
+<a href="/live">Live Displays</a>                        </div>
+                            <div class="ml-2 flex flex-row flex-wrap lg:flex-col border-separate">
+                                    <div class="mt-2 mr-4">
+                                        <a href="/live/progress">Progress</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/live/status">Status</a>
+                                    </div>
                             </div>
-                        </div>
-                    </div>
-                    <div id="undertitle">
-                        <div class="container bg-body">
-                            <div class="row">
-                                    <div class="col-md-3 col-lg-2 bg-body">
+                        <div class="text-blue-700 mt-4">
+<a href="/prompts">Prompts</a>                        </div>
+                            <div class="ml-2 flex flex-row flex-wrap lg:flex-col border-separate">
+                                    <div class="mt-2 mr-4">
+                                        <a href="/prompts/text">Text prompt</a>
                                     </div>
-                                    <div class="col-md-9 col-lg-8 bg-white">
+                                    <div class="mt-2 mr-4">
+                                        <a href="/prompts/selection">Selection</a>
                                     </div>
-                                <div class="col-lg-2 d-none d-lg-block bg-section">
-                                </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/prompts/multiselection">Multi Selection</a>
+                                    </div>
                             </div>
-                        </div>
-                    </div>
-
-                <div class="flex-grow-1 d-flex flex-column bg-body">
-                        <div class="container flex-grow-1 d-flex flex-column bg-white">
-                            <div class="row flex-grow-1 align-items-stretch">
-                                    <div class="sidebar col-md-3 col-lg-2 pt-2 bg-body">
-                                            <div class="sidebar-nav-item">
-<a href="/">Welcome</a>                                            </div>
-                                                <div class="sidebar-nav-item">
-<a href="/sponsors">Sponsors</a>                                                </div>
-                                                <div class="sidebar-nav-item">
-<a href="/quick-start">Quick Start</a>                                                </div>
-                                                <div class="sidebar-nav-item">
-<a href="/markup">Markup</a>                                                </div>
-                                                <div class="sidebar-nav-item">
-<a href="/exceptions">Exceptions</a>                                                </div>
-                                                <div class="sidebar-nav-item has-children">
-<a href="/live">Live Displays</a>                                                </div>
-                                                    <div class="sidebar-nav-children">
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/live/progress">Progress</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/live/status">Status</a>
-                                                            </div>
-                                                    </div>
-                                                <div class="sidebar-nav-item has-children">
-<a href="/prompts">Prompts</a>                                                </div>
-                                                    <div class="sidebar-nav-children">
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/prompts/text">Text prompt</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/prompts/selection">Selection</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/prompts/multiselection">Multi Selection</a>
-                                                            </div>
-                                                    </div>
-                                                <div class="sidebar-nav-item has-children">
-<a href="/widgets">Widgets</a>                                                </div>
-                                                    <div class="sidebar-nav-children active">
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/widgets/table">Table</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/widgets/tree">Tree</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/widgets/barchart">Bar Chart</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/widgets/rule">Rule</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/widgets/calendar">Calendar</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/widgets/figlet">Figlet</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/widgets/canvas">Canvas</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child active">
-                                                                <a href="/widgets/canvas-image">Canvas Image</a>
-                                                            </div>
-                                                    </div>
-                                                <div class="sidebar-nav-item has-children">
-<a href="/cli">CLI</a>                                                </div>
-                                                    <div class="sidebar-nav-children">
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/cli/getting-started">Getting Started</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/cli/commandapp">CommandApp</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/cli/settings">Specifying Settings</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/cli/commands">Creating Commands</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/cli/composing">Composing Commands</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/cli/migration">Migrate from Spectre.Cli</a>
-                                                            </div>
-                                                    </div>
-                                                <div class="sidebar-nav-item has-children">
-<a href="/appendix">Appendix</a>                                                </div>
-                                                    <div class="sidebar-nav-children">
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/appendix/colors">Colors</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/appendix/styles">Styles</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/appendix/borders">Borders</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/appendix/emojis">Emojis</a>
-                                                            </div>
-                                                            <div class="sidebar-nav-child">
-                                                                <a href="/appendix/spinners">Spinners</a>
-                                                            </div>
-                                                    </div>
+                        <div class="text-blue-700 mt-4">
+<a href="/widgets">Widgets</a>                        </div>
+                            <div class="ml-2 flex flex-row flex-wrap lg:flex-col border-separate">
+                                    <div class="mt-2 mr-4">
+                                        <a href="/widgets/table">Table</a>
                                     </div>
-                                    <div class="col-md-9 col-lg-8 pt-4 pt-md-0 pb-4 px-4">
-                                        <p>To add <a href="https://github.com/SixLabors/ImageSharp">ImageSharp</a> superpowers to
+                                    <div class="mt-2 mr-4">
+                                        <a href="/widgets/tree">Tree</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/widgets/barchart">Bar Chart</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/widgets/rule">Rule</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/widgets/calendar">Calendar</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/widgets/figlet">Figlet</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/widgets/canvas">Canvas</a>
+                                    </div>
+                                    <div class="mt-2 mr-4 font-bold">
+                                        <a href="/widgets/canvas-image">Canvas Image</a>
+                                    </div>
+                            </div>
+                        <div class="text-blue-700 mt-4">
+<a href="/cli">Spectre.Console.Cli</a>                        </div>
+                            <div class="ml-2 flex flex-row flex-wrap lg:flex-col border-separate">
+                                    <div class="mt-2 mr-4">
+                                        <a href="/cli/getting-started">Getting Started</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/cli/introduction">Introduction</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/cli/commandapp">CommandApp</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/cli/settings">Specifying Settings</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/cli/commands">Creating Commands</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/cli/composing">Composing Commands</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/cli/migration">Migrate from Spectre.Cli</a>
+                                    </div>
+                            </div>
+                        <div class="text-blue-700 mt-4">
+<a href="/appendix">Appendix</a>                        </div>
+                            <div class="ml-2 flex flex-row flex-wrap lg:flex-col border-separate">
+                                    <div class="mt-2 mr-4">
+                                        <a href="/appendix/colors">Colors</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/appendix/styles">Styles</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/appendix/borders">Borders</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/appendix/emojis">Emojis</a>
+                                    </div>
+                                    <div class="mt-2 mr-4">
+                                        <a href="/appendix/spinners">Spinners</a>
+                                    </div>
+                            </div>
+                </nav>
+                <article class="flex-1 min-w-0">
+                    <h1 class="text-gray-800 text-4xl mb-4 font-extrabold">Canvas Image</h1>
+                    <div class="prose max-w-none prose-sm lg:prose lg:max-w-none 2xl:prose-xl 2xl:max-w-none text-gray-700 font-light">
+                        <p>To add <a href="https://github.com/SixLabors/ImageSharp">ImageSharp</a> superpowers to
 your console application to draw images, you will need to install
 the <a href="https://www.nuget.org/packages/Spectre.Console.ImageSharp">Spectre.Console.ImageSharp</a> NuGet package.</p>
 <pre><code class="language-text">&gt; dotnet add package Spectre.Console.ImageSharp
 </code></pre>
-<h1 id="loading-images">Loading images</h1>
+<h2 id="loading-images">Loading images</h2>
 <p>Once you've added the <code>Spectre.Console.ImageSharp</code> NuGet package,
 you can create a new instance of <code>CanvasImage</code> to draw images to the console.</p>
 <pre><code class="language-csharp">// Load an image
@@ -267,71 +247,46 @@ AnsiConsole.Render(image);
 <span>                      </span><span style="background-color: #171717">  </span><span style="background-color: #1E1E1E">  </span><span style="background-color: #222222">    </span><span>                                  </span>
 </pre>
 
-                                    </div>
-                                <div class="col-lg-2 d-none d-lg-block bg-body pl-3 pt-3">
-                                            <div class="border-bottom mb-3">
-                                                <p class="small font-weight-bold">On This Page</p>
-                                                    <p class="small"><a href="#loading-images">Loading images</a></p>
-                                                    <p class="small"><a href="#manipulating-images">Manipulating images</a></p>
-                                            </div>
-                                        <p class="small font-weight-bold"><a href="https://github.com/spectreconsole/spectre.console/edit/main/docs/input/widgets/canvas-image.md"><i class="fad fa-pencil"></i> Edit This Page</a></p>
-                                </div>
-                            </div>
-                        </div>
-                </div>
+                    </div>
+                </article>
             </div>
-        </div>
-        <div id="footer" class="p-3 text-white font-size-sm">
+        </main>
+
+        <footer class="py-4 md:py-8 mt-8 bg-gray-100 text-sm border-t border-gray-200">
             <div class="container">
-                <div>
+                <div class="flex flex-row">
                     <span>© 2021 Patrik Svensson, Phil Scott</span>
-                    <span class="float-right" style="color: #888888;">0.39.1-preview.0.8</span>
+                    <span class="ml-auto">1.0.0</span>
                 </div>
             </div>
-        </div>
-        <script>
-            $(document).ready(function() {
-                mermaid.initialize(
-                {
-                    flowchart:
-                    {
-                        useMaxWidth: false
-                    },
-					startOnLoad: false,
-					cloneCssStyles: false
-                });
-                mermaid.init(undefined, ".mermaid");
+        </footer>
 
-                // Remove the max-width setting that Mermaid sets
-                var mermaidSvg = $('.mermaid svg');
-                mermaidSvg.addClass('img-responsive');
-                mermaidSvg.css('max-width', '');
 
-                // Make it scrollable
-				var target = document.querySelector(".mermaid svg");
-				if(target !== null)
-				{
-					var panZoom = window.panZoom = svgPanZoom(target, {
-						zoomEnabled: true,
-						controlIconsEnabled: true,
-						fit: true,
-						center: true,
-                        maxZoom: 20,
-                        zoomScaleSensitivity: 0.6
-					});
+    <script>
+    // adapted from https://www.w3schools.com/howto/howto_js_filter_table.asp
+    function search(input, searchTarget, columnIndex) {
+    // Declare variables
+    var filter, table, tr, td, i, txtValue;
+    filter = input.value.toUpperCase();
+    table = document.getElementById(searchTarget);
+    tr = table.getElementsByTagName("tr");
 
-                    // Do the reset once right away to fit the diagram
-                    panZoom.resize();
-                    panZoom.fit();
-                    panZoom.center();
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[columnIndex];
+        if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        }
+        }
+    }
+    }
+    </script>
 
-                    $(window).resize(function(){
-                        panZoom.resize();
-                        panZoom.fit();
-                        panZoom.center();
-                    });
-				}
-            });
-        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" integrity="sha512-YBk7HhgDZvBxmtOfUdvX0z8IH2d10Hp3aEygaMNhtF8fSOvBZ16D/1bXZTJV6ndk/L/DlXxYStP8jrF77v2MIg==" crossorigin="anonymous"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-zc7WDnCM3aom2EziyDIRAtQg1mVXLdILE09Bo+aE1xk0AM2c2cVLfSW9NrxE5tKTX44WBY0Z2HClZ05ur9vB6A==" crossorigin="anonymous"></script>
     </body>
 </html>
