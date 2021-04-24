@@ -191,14 +191,14 @@
 </code></pre>
 <p>This setting file tells <code>Spectre.Console.Cli</code> that our command has two parameters. One is marked as a <code>CommandArgument</code>, the other is a <code>CommandOption</code>.</p>
 <h1 id="commandargument"><code>CommandArgument</code>.</h1>
-<p>Arguments have a position and a name. The name is not only used for generating help, but it's formatting is used to determine whether or not the argument is optional. The name must either be surrounded by square brackets (e.g. <code>[name]</code>) or angle brackets (e.g. <code>&lt;name&gt;</code>). Square brackets are required where as angle are optional. If neither are specified an exception will be thrown.</p>
+<p>Arguments have a position and a name. The name is not only used for generating help, but it's formatting is used to determine whether or not the argument is optional. The name must either be surrounded by square brackets (e.g. <code>[name]</code>) or angle brackets (e.g. <code>&lt;name&gt;</code>). Angle brackets denote required whereas square brackets denote optional. If neither are specified an exception will be thrown.</p>
 <p>The position is used for scenarios where there could be more than one argument.</p>
 <p>For example, we could split the above name argument into two values with an optional last name.</p>
-<pre><code class="language-csharp">[CommandArgument(0, &quot;[firstName]&quot;)]
+<pre><code class="language-csharp">[CommandArgument(0, &quot;&lt;firstName&gt;&quot;)]
 public string FirstName { get; set; }
 
-[CommandArgument(1, &quot;&lt;lastName&gt;&quot;)]
-public string FirstName { get; set; }
+[CommandArgument(1, &quot;[lastName]&quot;)]
+public string LastName { get; set; }
 </code></pre>
 <h1 id="commandoption"><code>CommandOption</code>.</h1>
 <p><code>CommandOption</code> is used when you have options that are passed in command line switches. The attribute has one parameter - a pipe delimited string with the list of argument names. The following rules apply:</p>
@@ -261,7 +261,7 @@ public string[] Name { get; set; }
     public override ValidationResult Validate()
     {
         return Name.Length &lt; 2
-            ? ValidationResult.Error(&quot;Names must be at least two characters long&quot;) 
+            ? ValidationResult.Error(&quot;Names must be at least two characters long&quot;)
             : ValidationResult.Success();
     }
 }
@@ -291,7 +291,7 @@ public string[] Name { get; set; }
             <div class="container">
                 <div>
                     <span>© 2021 Patrik Svensson, Phil Scott</span>
-                    <span class="float-right" style="color: #888888;">0.39.1-preview.0.7</span>
+                    <span class="float-right" style="color: #888888;">0.39.1-preview.0.8</span>
                 </div>
             </div>
         </div>
