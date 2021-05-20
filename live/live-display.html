@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -13,7 +13,7 @@
         <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png">
 
-        <title>Spectre.Console - Figlet</title>
+        <title>Spectre.Console - Live Display</title>
         <meta name="description" content="Spectre.Console is a .NET Standard 2.0 library that makes it easier to create beautiful console applications" />
     </head>
     <body class="antialiased text-gray-600 min-h-full flex flex-col  bg-gray-50">
@@ -62,7 +62,7 @@
                         <div class="text-blue-700 mt-4">
 <a href="/live">Live</a>                        </div>
                             <div class="ml-2 flex flex-row flex-wrap lg:flex-col border-separate">
-                                    <div class="mt-2 mr-4">
+                                    <div class="mt-2 mr-4 font-bold">
                                         <a href="/live/live-display">Live Display</a>
                                     </div>
                                     <div class="mt-2 mr-4">
@@ -103,7 +103,7 @@
                                     <div class="mt-2 mr-4">
                                         <a href="/widgets/calendar">Calendar</a>
                                     </div>
-                                    <div class="mt-2 mr-4 font-bold">
+                                    <div class="mt-2 mr-4">
                                         <a href="/widgets/figlet">Figlet</a>
                                     </div>
                                     <div class="mt-2 mr-4">
@@ -159,28 +159,55 @@
                             </div>
                 </nav>
                 <article class="flex-1 min-w-0">
-                    <h1 class="text-gray-800 text-4xl mb-4 font-extrabold">Figlet</h1>
+                    <h1 class="text-gray-800 text-4xl mb-4 font-extrabold">Live Display</h1>
                     <div class="prose max-w-none prose-sm lg:prose lg:max-w-none 2xl:prose-xl 2xl:max-w-none text-gray-700 font-light">
-                        <p>Spectre.Console can render <a href="http://www.figlet.org/">FIGlet</a> text by using the <code>FigletText</code> class.</p>
-<h2 id="default-font">Default font</h2>
-<pre><code class="language-csharp">AnsiConsole.Render(
-    new FigletText(&quot;Hello&quot;)
-        .LeftAligned()
-        .Color(Color.Red));
-</code></pre>
-<pre><code class="language-text"> _   _          _   _          
-| | | |   ___  | | | |   ___  
-| |_| |  / _ \ | | | |  / _ \ 
-|  _  | |  __/ | | | | | (_) |
-|_| |_|  \___| |_| |_|  \___/ 
-</code></pre>
-<h2 id="custom-font">Custom font</h2>
-<pre><code class="language-csharp">var font = FigletFont.Load(&quot;starwars.flf&quot;);
+                        <p>Spectre.Console can update arbitrary widgets in-place.</p>
+<div class="alert-warning">
+<p>The live display is not
+thread safe, and using it together with other interactive components such as
+prompts, status displays or other progress displays are not supported.</p>
+</div>
+<pre><code class="language-csharp">var table = new Table().Centered();
 
-AnsiConsole.Render(
-    new FigletText(font, &quot;Hello&quot;)
-        .LeftAligned()
-        .Color(Color.Red));
+AnsiConsole.Live(table)
+    .Start(ctx =&gt; 
+    {
+        table.AddColumn(&quot;Foo&quot;);
+        ctx.Refresh();
+        Thread.Sleep(1000);
+
+        table.AddColumn(&quot;Bar&quot;);
+        ctx.Refresh();
+        Thread.Sleep(1000);
+    });
+</code></pre>
+<h2 id="asynchronous-progress">Asynchronous progress</h2>
+<p>If you prefer to use async/await, you can use <code>StartAsync</code> instead of <code>Start</code>.</p>
+<pre><code class="language-csharp">var table = new Table().Centered();
+
+await AnsiConsole.Live(table)
+    .StartAsync(async ctx =&gt; 
+    {
+        table.AddColumn(&quot;Foo&quot;);
+        ctx.Refresh();
+        await Task.Delay(1000);
+
+        table.AddColumn(&quot;Bar&quot;);
+        ctx.Refresh();
+        await Task.Delay(1000);
+    });
+</code></pre>
+<h2 id="configure">Configure</h2>
+<pre><code class="language-csharp">var table = new Table().Centered();
+
+AnsiConsole.Live(table)
+    .AutoClear(false)   // Do not remove when done
+    .Overflow(VerticalOverflow.Ellipsis) // Show ellipsis when overflowing
+    .Cropping(VerticalOverflowCropping.Top) // Crop overflow at top
+    .Start(ctx =&gt;
+    {
+        // Omitted
+    });
 </code></pre>
 
                     </div>
