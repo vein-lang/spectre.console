@@ -203,8 +203,7 @@ internal sealed class FileSizeCommand : Command&lt;FileSizeCommand.Settings&gt;
         var totalFileSize = files
             .Sum(fileInfo =&gt; fileInfo.Length);
 
-        AnsiConsole.MarkupLine(
-            $&quot;Total file size for [green]{searchPattern}[/] files in [green]{searchPath}[/]: [blue]{totalFileSize:N0}[/] bytes&quot;);  $&quot;Total file size for [green]{searchPattern}[/] files in [green]{searchPath}[/]: [blue]{totalFileSize:N0}[/] bytes&quot;);
+        AnsiConsole.MarkupLine($&quot;Total file size for [green]{searchPattern}[/] files in [green]{searchPath}[/]: [blue]{totalFileSize:N0}[/] bytes&quot;);
 
         return 0;
     }
