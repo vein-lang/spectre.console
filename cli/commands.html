@@ -164,7 +164,7 @@
                         <p>Commands in <code>Spectre.Console.Cli</code> are defined by creating a class that inherits from either <code>Spectre.Console.Cli.Command&lt;TSettings&gt;</code> or <code>Spectre.Console.Cli.AsyncCommand&lt;TSettings&gt;</code>. <code>Command&lt;TSettings&gt;</code> must implement an <code>Execute</code> method that returns an int where as <code>AsyncCommand&lt;TSettings&gt;</code> must implement <code>ExecuteAsync</code>  returning <code>Task&lt;int&gt;</code>.</p>
 <pre><code class="language-csharp">public class HelloCommand : Command&lt;HelloCommand.Settings&gt;
 {
-    public class Settings : LogCommandSettings
+    public class Settings : CommandSettings
     {
         [CommandArgument(0, &quot;[Name]&quot;)]
         public string Name { get; set; }
