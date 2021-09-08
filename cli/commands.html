@@ -198,7 +198,7 @@
 }
 </code></pre>
 <h2 id="configuring">Configuring</h2>
-<p>Commands are configured via the <a href="commandApp"><code>CommandApp</code></a>'s <code>Configure</code> method.</p>
+<p>Commands are configured via the <a href="commandapp"><code>CommandApp</code></a>'s <code>Configure</code> method.</p>
 <pre><code class="language-csharp">var app = new CommandApp();
 app.Configure(config =&gt;
 {
@@ -215,7 +215,7 @@ app.Configure(config =&gt;
 <li><code>WithExample</code> is used by the help renderer to provide examples to the user for running the commands. The parameters is a string array that matches the values passed in <code>Main(string[] args)</code>.</li>
 </ul>
 <h2 id="dependency-injection">Dependency Injection</h2>
-<p>Constructor injection is supported on commands. See the <a href="commandApp"><code>CommandApp</code></a> documentation for further information on configuring <code>Spectre.Console</code> for your container.</p>
+<p>Constructor injection is supported on commands. See the <a href="commandapp"><code>CommandApp</code></a> documentation for further information on configuring <code>Spectre.Console</code> for your container.</p>
 <h2 id="validation">Validation</h2>
 <p>While the settings can validate themselves, the command also provides a validation. For example, <code>IFileSystem</code> might be injected into the command which we want to use to validate that a path passed in exists.</p>
 <pre><code class="language-csharp">public override ValidationResult Validate(CommandContext context, Settings settings)
