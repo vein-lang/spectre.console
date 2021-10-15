@@ -236,7 +236,7 @@ internal sealed class FileSizeCommand : Command&lt;FileSizeCommand.Settings&gt;
 <li>The third will also be a parameter option. Here <code>DefaultValue</code> is used to indicate the default value will be <code>true</code>. For boolean parameters these will be interpreted as flags which means the user can just specify <code>--hidden</code> rather than <code>-hidden true</code>.</li>
 </ul>
 <p>When <code>args</code> is passed into the <code>CommandApp</code>'s run method, <code>Spectre.Console.Cli</code> will parse those arguments and populate an instance of your settings. Upon success, it will then pass those settings into an instance of the specified command's <code>Execute</code> method.</p>
-<p>With this in place, we can the following commands will all work</p>
+<p>With this in place, the following commands will all work</p>
 <pre><code class="language-text">app.exe
 app.exe c:\windows
 app.exe c:\windows --pattern *.dll

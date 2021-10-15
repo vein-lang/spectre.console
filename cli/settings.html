@@ -193,7 +193,7 @@
 </code></pre>
 <p>This setting file tells <code>Spectre.Console.Cli</code> that our command has two parameters. One is marked as a <code>CommandArgument</code>, the other is a <code>CommandOption</code>.</p>
 <h2 id="commandargument">CommandArgument</h2>
-<p>Arguments have a position and a name. The name is not only used for generating help, but it's formatting is used to determine whether or not the argument is optional. The name must either be surrounded by square brackets (e.g. <code>[name]</code>) or angle brackets (e.g. <code>&lt;name&gt;</code>). Angle brackets denote required whereas square brackets denote optional. If neither are specified an exception will be thrown.</p>
+<p>Arguments have a position and a name. The name is not only used for generating help, but its formatting is used to determine whether or not the argument is optional. The name must either be surrounded by square brackets (e.g. <code>[name]</code>) or angle brackets (e.g. <code>&lt;name&gt;</code>). Angle brackets denote required whereas square brackets denote optional. If neither are specified an exception will be thrown.</p>
 <p>The position is used for scenarios where there could be more than one argument.</p>
 <p>For example, we could split the above name argument into two values with an optional last name.</p>
 <pre><code class="language-csharp">[CommandArgument(0, &quot;&lt;firstName&gt;&quot;)]

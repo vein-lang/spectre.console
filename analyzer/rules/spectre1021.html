@@ -186,7 +186,7 @@
 <p>Avoid prompting for input while a current renderable is running.</p>
 
 <h2 id="cause">Cause</h2>
-<p>A violation of this rule occurs when a AnsiConsole prompt is called within the context of an executing renderable e.g. <code>Progress</code>, <code>Status</code> and <code>Live</code>. Concurrent LiveRenderable are not supported and will cause issues when running simultaneously.</p>
+<p>A violation of this rule occurs when an AnsiConsole prompt is called within the context of an executing renderable e.g. <code>Progress</code>, <code>Status</code> and <code>Live</code>. Concurrent LiveRenderable are not supported and will cause issues when running simultaneously.</p>
 <h2 id="reason-for-rule">Reason for rule</h2>
 <p>When LiveRenderable such as <code>Progress</code>, <code>Status</code> or <code>Live</code> are running they expect to be running exclusively. They rely on ANSI sequences to draw and keep the console experience consistent. Prompts also rely on ANSI sequences for their drawing. Simultaneous running can result in corrupt output.</p>
 <h2 id="how-to-fix-violations">How to fix violations</h2>

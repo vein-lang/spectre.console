@@ -192,7 +192,7 @@ app.Configure(config =&gt;
 });
 </code></pre>
 <h2 id="multiple-commands">Multiple Commands</h2>
-<p>In the previous example we have a single command that is configured. For complex command line applications, it is common for them to have multiple commands (or verbs) defined. Examples of applications like this are <code>git</code>, <code>dotnet</code> and <code>gh</code>. For example, git would have an <code>commit</code> command and along with other commits like <code>add</code> or <code>rebase</code>. Each with their own settings and validation. With <code>Spectre.Console.Cli</code> we use the <code>Configure</code> method to add these commands.</p>
+<p>In the previous example we have a single command that is configured. For complex command line applications, it is common for them to have multiple commands (or verbs) defined. Examples of applications like this are <code>git</code>, <code>dotnet</code> and <code>gh</code>. For example, git would have a <code>commit</code> command and along with other commits like <code>add</code> or <code>rebase</code>. Each with their own settings and validation. With <code>Spectre.Console.Cli</code> we use the <code>Configure</code> method to add these commands.</p>
 <p>For example, to add three different commands to the application:</p>
 <pre><code class="language-csharp">var app = new CommandApp();
 app.Configure(config =&gt;
@@ -202,7 +202,7 @@ app.Configure(config =&gt;
     config.AddCommand&lt;RebaseCommand&gt;(&quot;rebase&quot;);
 });
 </code></pre>
-<p>This configuration would allow users to run <code>app.exe add</code>, <code>app.exe commit</code>, or <code>app.exe rebase</code> and have the settings routed the appropriate command.</p>
+<p>This configuration would allow users to run <code>app.exe add</code>, <code>app.exe commit</code>, or <code>app.exe rebase</code> and have the settings routed to the appropriate command.</p>
 <p>For more complex command hierarchical configurations, they can also be composed via inheritance and branching. See <a href="composing">Composing Commands</a>.</p>
 <h2 id="customizing-command-configurations">Customizing Command Configurations</h2>
 <p>The <code>Configure</code> method is also used to change how help for the commands is generated. This configuration will give our command an additional alias of <code>file-size</code> and a description to be used when displaying the help. Additional, an example is specified that will be parsed and displayed for users asking for help. Multiple examples can be provided. Commands can also be marked as hidden. With this option they are still executable, but will not be displayed in help screens.</p>
@@ -232,7 +232,7 @@ return app.Run(args);
 </code></pre>
 <p><code>TypeRegistrar</code> is a custom class that must be created by the user. This <a href="https://github.com/spectreconsole/spectre.console/tree/main/examples/Cli/Injection">example using <code>Microsoft.Extensions.DependencyInjection</code> as the container</a> provides an example <code>TypeRegistrar</code> and <code>TypeResolver</code> that can be added to your application with small adjustments for your DI container.</p>
 <h2 id="interception">Interception</h2>
-<p><code>CommandApp</code> also provides a <code>SetInterceptor</code> configuration. An interceptor is ran before all commands are executed. This is typically used for configuring logging or other infrastructure concerns.</p>
+<p><code>CommandApp</code> also provides a <code>SetInterceptor</code> configuration. An interceptor is run before all commands are executed. This is typically used for configuring logging or other infrastructure concerns.</p>
 <p>All interceptors must implement <code>ICommandInterceptor</code>. Upon execution of a command, an instance of your interceptor will be called with the parsed settings. This provides an opportunity for configuring any infrastructure or modifying the settings.</p>
 <p>For an example of using the interceptor to configure logging, see the <a href="https://github.com/spectreconsole/spectre.console/tree/main/examples/Cli/Logging">Serilog demo</a>.</p>
 
