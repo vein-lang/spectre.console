@@ -18,6 +18,12 @@ namespace Spectre.Console
         public bool AutoStart { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether or not the task
+        /// will be allowing hide. Defaults to <c>true</c>.
+        /// </summary>
+        public bool AllowHide { get; set; } = true;
+
+        /// <summary>
         /// Gets the default progress task settings.
         /// </summary>
         internal static ProgressTaskSettings Default { get; } = new ProgressTaskSettings();
