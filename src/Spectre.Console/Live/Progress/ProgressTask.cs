@@ -16,6 +16,8 @@ namespace Spectre.Console
         private string _description;
         private double _value;
 
+        private const string _STATE_TASK_FAILED = "_isFailed_";
+
         /// <summary>
         /// Gets the task ID.
         /// </summary>
@@ -67,6 +69,11 @@ namespace Spectre.Console
         /// Gets a value indicating whether or not the task has started.
         /// </summary>
         public bool IsStarted => StartTime != null;
+
+        /// <summary>
+        /// Gets a value indicating whether or not the task has failed.
+        /// </summary>
+        public bool IsFailed => (StopTime != null || Value >= MaxValue) && State.Get<bool>(_STATE_TASK_FAILED);
 
         /// <summary>
         /// Gets a value indicating whether or not the task has finished.
@@ -145,7 +152,10 @@ namespace Spectre.Console
         /// <summary>
         /// Stops and marks the task as finished.
         /// </summary>
-        public void StopTask()
+        /// <param name="failed">
+        /// Indication task is failed or not.
+        /// </param>
+        public void StopTask(bool failed = false)
         {
             lock (_lock)
             {
@@ -153,6 +163,8 @@ namespace Spectre.Console
                 StartTime ??= now;
 
                 StopTime = now;
+
+                State.Update<bool>(_STATE_TASK_FAILED, (_) => failed);
             }
         }
 

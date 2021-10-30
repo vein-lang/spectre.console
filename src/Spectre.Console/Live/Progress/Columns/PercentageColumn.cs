@@ -18,10 +18,19 @@ namespace Spectre.Console
         /// </summary>
         public Style CompletedStyle { get; set; } = new Style(foreground: Color.Green);
 
+        /// <summary>
+        /// Gets or sets the style for a failed task.
+        /// </summary>
+        public Style FailedStyle { get; set; } = new Style(foreground: Color.Red);
+
         /// <inheritdoc/>
         public override IRenderable Render(RenderContext context, ProgressTask task, TimeSpan deltaTime)
         {
             var percentage = (int)task.Percentage;
+            if (task.IsFailed)
+            {
+                return new Text($"{percentage}%", FailedStyle).RightAligned();
+            }
             var style = percentage == 100 ? CompletedStyle : Style ?? Style.Plain;
             return new Text($"{percentage}%", style).RightAligned();
         }

@@ -16,6 +16,7 @@ namespace Spectre.Console
         private Spinner _spinner;
         private int? _maxWidth;
         private string? _completed;
+        private string? _failed;
         private string? _pending;
 
         /// <inheritdoc/>
@@ -53,6 +54,20 @@ namespace Spectre.Console
 
         /// <summary>
         /// Gets or sets the text that should be shown instead
+        /// of the spinner once a task failed.
+        /// </summary>
+        public string? FailedText
+        {
+            get => _failed;
+            set
+            {
+                _failed = value;
+                _maxWidth = null;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the text that should be shown instead
         /// of the spinner before a task begins.
         /// </summary>
         public string? PendingText
@@ -69,6 +84,11 @@ namespace Spectre.Console
         /// Gets or sets the completed style.
         /// </summary>
         public Style? CompletedStyle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the failed style.
+        /// </summary>
+        public Style? FailedStyle { get; set; }
 
         /// <summary>
         /// Gets or sets the pending style.
@@ -107,6 +127,11 @@ namespace Spectre.Console
             if (!task.IsStarted)
             {
                 return new Markup(PendingText ?? " ", PendingStyle ?? Style.Plain);
+            }
+
+            if (task.IsFailed)
+            {
+                return new Markup(FailedText ?? " ", FailedStyle ?? Style.Plain);
             }
 
             if (task.IsFinished)
