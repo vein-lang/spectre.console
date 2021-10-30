@@ -101,7 +101,7 @@ namespace Spectre.Console
                 }
 
                 // Add rows
-                foreach (var task in context.GetTasks().Where(tsk => !(_hideCompleted && tsk.IsFinished)))
+                foreach (var task in context.GetTasks().Where(tsk => !(_hideCompleted && tsk.IsFinished && !tsk.IsFailed && !tsk.IsAllowHide)))
                 {
                     var columns = _columns.Select(column => column.Render(renderContext, task, delta));
                     grid.AddRow(columns.ToArray());

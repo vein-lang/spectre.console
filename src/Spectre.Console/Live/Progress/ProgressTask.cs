@@ -9,14 +9,16 @@ namespace Spectre.Console
     /// </summary>
     public sealed class ProgressTask : IProgress<double>
     {
+        internal const string STATE_TASK_FAILED = "_isFailed_";
+
         private readonly List<ProgressSample> _samples;
         private readonly object _lock;
 
         private double _maxValue;
         private string _description;
         private double _value;
+        private bool _allow_hide;
 
-        private const string STATE_TASK_FAILED = "_isFailed_";
 
         /// <summary>
         /// Gets the task ID.
@@ -81,6 +83,11 @@ namespace Spectre.Console
         public bool IsFinished => StopTime != null || Value >= MaxValue;
 
         /// <summary>
+        /// Gets a value indicating whether or not the task has allow hide.
+        /// </summary>
+        public bool IsAllowHide => _allow_hide;
+
+        /// <summary>
         /// Gets the percentage done of the task.
         /// </summary>
         public double Percentage => GetPercentage();
@@ -113,12 +120,13 @@ namespace Spectre.Console
         /// <param name="description">The task description.</param>
         /// <param name="maxValue">The task max value.</param>
         /// <param name="autoStart">Whether or not the task should start automatically.</param>
-        public ProgressTask(int id, string description, double maxValue, bool autoStart = true)
+        public ProgressTask(int id, string description, double maxValue, bool autoStart = true, bool allowHide = true)
         {
             _samples = new List<ProgressSample>();
             _lock = new object();
             _maxValue = maxValue;
             _value = 0;
+            _allow_hide = allowHide;
 
             _description = description?.RemoveNewLines()?.Trim() ??
                            throw new ArgumentNullException(nameof(description));
