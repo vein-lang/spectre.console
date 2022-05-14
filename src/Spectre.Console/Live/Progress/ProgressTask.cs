@@ -5,6 +5,7 @@ namespace Spectre.Console;
 /// </summary>
 public sealed class ProgressTask : IProgress<double>
 {
+    internal const string STATE_TASK_FAILED = "_isFailed_";
     private readonly List<ProgressSample> _samples;
     private readonly object _lock;
 
@@ -22,21 +23,32 @@ public sealed class ProgressTask : IProgress<double>
     /// </summary>
     public string Description
     {
-        internal const string STATE_TASK_FAILED = "_isFailed_";
+        get => _description;
+        set => Update(description: value);
+    }
 
-        private readonly List<ProgressSample> _samples;
-        private readonly object _lock;
+    /// <summary>
+    /// Gets or sets the max value of the task.
+    /// </summary>
+    public double MaxValue
+    {
+        get => _maxValue;
+        set => Update(maxValue: value);
+    }
 
-        private double _maxValue;
-        private string _description;
-        private double _value;
-        private bool _allow_hide;
+    /// <summary>
+    /// Gets or sets the value of the task.
+    /// </summary>
+    public double Value
+    {
+        get => _value;
+        set => Update(value: value);
+    }
 
-
-        /// <summary>
-        /// Gets the task ID.
-        /// </summary>
-        public int Id { get; }
+    /// <summary>
+    /// Gets the elapsed time.
+    /// </summary>
+    public TimeSpan? ElapsedTime => GetElapsedTime();
 
     /// <summary>
     /// Gets the start time of the task.
@@ -73,25 +85,15 @@ public sealed class ProgressTask : IProgress<double>
     /// </summary>
     public double? Speed => GetSpeed();
 
-        /// <summary>
-        /// Gets a value indicating whether or not the task has failed.
-        /// </summary>
-        public bool IsFailed => (StopTime != null || Value >= MaxValue) && State.Get<bool>(STATE_TASK_FAILED);
+    /// <summary>
+    /// Gets a value indicating whether or not the task has failed.
+    /// </summary>
+    public bool IsFailed => (StopTime != null || Value >= MaxValue) && State.Get<bool>(STATE_TASK_FAILED);
 
-        /// <summary>
-        /// Gets a value indicating whether or not the task has finished.
-        /// </summary>
-        public bool IsFinished => StopTime != null || Value >= MaxValue;
-
-        /// <summary>
-        /// Gets a value indicating whether or not the task has allow hide.
-        /// </summary>
-        public bool IsAllowHide => _allow_hide;
-
-        /// <summary>
-        /// Gets the percentage done of the task.
-        /// </summary>
-        public double Percentage => GetPercentage();
+    /// <summary>
+    /// Gets the remaining time.
+    /// </summary>
+    public TimeSpan? RemainingTime => GetRemainingTime();
 
     /// <summary>
     /// Gets or sets a value indicating whether the ProgressBar shows
@@ -125,24 +127,14 @@ public sealed class ProgressTask : IProgress<double>
         StartTime = autoStart ? DateTime.Now : null;
     }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProgressTask"/> class.
-        /// </summary>
-        /// <param name="id">The task ID.</param>
-        /// <param name="description">The task description.</param>
-        /// <param name="maxValue">The task max value.</param>
-        /// <param name="autoStart">Whether or not the task should start automatically.</param>
-        public ProgressTask(int id, string description, double maxValue, bool autoStart = true, bool allowHide = true)
+    /// <summary>
+    /// Starts the task.
+    /// </summary>
+    public void StartTask()
+    {
+        lock (_lock)
         {
-            _samples = new List<ProgressSample>();
-            _lock = new object();
-            _maxValue = maxValue;
-            _value = 0;
-            _allow_hide = allowHide;
-
-            _description = description?.RemoveNewLines()?.Trim() ??
-                           throw new ArgumentNullException(nameof(description));
-            if (string.IsNullOrWhiteSpace(_description))
+            if (StopTime != null)
             {
                 throw new InvalidOperationException("Stopped tasks cannot be restarted");
             }
@@ -166,30 +158,22 @@ public sealed class ProgressTask : IProgress<double>
         }
     }
 
-        /// <summary>
-        /// Stops and marks the task as finished.
-        /// </summary>
-        /// <param name="failed">
-        /// Indication task is failed or not.
-        /// </param>
-        public void StopTask(bool failed = false)
-        {
-            lock (_lock)
-            {
-                var now = DateTime.Now;
-                StartTime ??= now;
+    /// <summary>
+    /// Increments the task's value.
+    /// </summary>
+    /// <param name="value">The value to increment with.</param>
+    public void Increment(double value)
+    {
+        Update(increment: value);
+    }
 
-                StopTime = now;
-
-                State.Update<bool>(STATE_TASK_FAILED, (_) => failed);
-            }
-        }
-
-        /// <summary>
-        /// Increments the task's value.
-        /// </summary>
-        /// <param name="value">The value to increment with.</param>
-        public void Increment(double value)
+    private void Update(
+        string? description = null,
+        double? maxValue = null,
+        double? increment = null,
+        double? value = null)
+    {
+        lock (_lock)
         {
             var startValue = Value;
 

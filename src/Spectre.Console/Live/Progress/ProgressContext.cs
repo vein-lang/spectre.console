@@ -30,40 +30,36 @@ public sealed class ProgressContext
     /// <param name="description">The task description.</param>
     /// <param name="autoStart">Whether or not the task should start immediately.</param>
     /// <param name="maxValue">The task's max value.</param>
+    /// <param name="allowHide">Allow auto hide</param>
     /// <returns>The newly created task.</returns>
-    public ProgressTask AddTask(string description, bool autoStart = true, double maxValue = 100)
+    public ProgressTask AddTask(string description, bool autoStart = true, double maxValue = 100, bool allowHide = true)
     {
         return AddTask(description, new ProgressTaskSettings
         {
             AutoStart = autoStart,
             MaxValue = maxValue,
+            AllowHide = allowHide,
         });
     }
 
-        /// <summary>
-        /// Adds a task.
-        /// </summary>
-        /// <param name="description">The task description.</param>
-        /// <param name="autoStart">Whether or not the task should start immediately.</param>
-        /// <param name="maxValue">The task's max value.</param>
-        /// <returns>The newly created task.</returns>
-        public ProgressTask AddTask(string description, bool autoStart = true, double maxValue = 100, bool allowHide = true)
+    /// <summary>
+    /// Adds a task.
+    /// </summary>
+    /// <param name="description">The task description.</param>
+    /// <param name="settings">The task settings.</param>
+    /// <returns>The newly created task.</returns>
+    public ProgressTask AddTask(string description, ProgressTaskSettings settings)
+    {
+        if (settings is null)
         {
-            return AddTask(description, new ProgressTaskSettings
-            {
-                AutoStart = autoStart,
-                MaxValue = maxValue,
-                AllowHide = allowHide
-            });
+            throw new ArgumentNullException(nameof(settings));
         }
 
         lock (_taskLock)
         {
             var task = new ProgressTask(_taskId++, description, settings.MaxValue, settings.AutoStart);
 
-            lock (_taskLock)
-            {
-                var task = new ProgressTask(_taskId++, description, settings.MaxValue, settings.AutoStart, settings.AllowHide);
+            _tasks.Add(task);
 
             return task;
         }

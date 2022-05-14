@@ -20,15 +20,15 @@ public sealed class ProgressBarColumn : ProgressColumn
     /// </summary>
     public Style FinishedStyle { get; set; } = new Style(foreground: Color.Green);
 
-        /// <summary>
-        /// Gets or sets the style of a failed progress bar.
-        /// </summary>
-        public Style FailedStyle { get; set; } = new Style(foreground: Color.Red);
+    /// <summary>
+    /// Gets or sets the style of a failed progress bar.
+    /// </summary>
+    public Style FailedStyle { get; set; } = new Style(foreground: Color.Red);
 
-        /// <summary>
-        /// Gets or sets the style of remaining portions of the progress bar.
-        /// </summary>
-        public Style RemainingStyle { get; set; } = new Style(foreground: Color.Grey);
+    /// <summary>
+    /// Gets or sets the style of remaining portions of the progress bar.
+    /// </summary>
+    public Style RemainingStyle { get; set; } = new Style(foreground: Color.Grey);
 
     /// <summary>
     /// Gets or sets the style of an indeterminate progress bar.
@@ -40,17 +40,14 @@ public sealed class ProgressBarColumn : ProgressColumn
     {
         return new ProgressBar
         {
-            return new ProgressBar
-            {
-                MaxValue = task.MaxValue,
-                Value = task.Value,
-                Width = Width,
-                CompletedStyle = task.IsFailed ? FailedStyle : CompletedStyle,
-                FinishedStyle = task.IsFailed ? FailedStyle : FinishedStyle,
-                RemainingStyle = RemainingStyle,
-                IndeterminateStyle = IndeterminateStyle,
-                IsIndeterminate = task.IsIndeterminate,
-            };
-        }
+            MaxValue = task.MaxValue,
+            Value = task.Value,
+            Width = Width,
+            CompletedStyle = task.IsFailed ? FailedStyle : CompletedStyle,
+            FinishedStyle = task.IsFailed ? FailedStyle : FinishedStyle,
+            RemainingStyle = RemainingStyle,
+            IndeterminateStyle = IndeterminateStyle,
+            IsIndeterminate = task.IsIndeterminate,
+        };
     }
 }

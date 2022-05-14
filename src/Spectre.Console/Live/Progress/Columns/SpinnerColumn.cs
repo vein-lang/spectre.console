@@ -8,12 +8,12 @@ public sealed class SpinnerColumn : ProgressColumn
     private const string ACCUMULATED = "SPINNER_ACCUMULATED";
     private const string INDEX = "SPINNER_INDEX";
 
-        private readonly object _lock;
-        private Spinner _spinner;
-        private int? _maxWidth;
-        private string? _completed;
-        private string? _failed;
-        private string? _pending;
+    private readonly object _lock;
+    private Spinner _spinner;
+    private int? _maxWidth;
+    private string? _completed;
+    private string? _failed;
+    private string? _pending;
 
     /// <inheritdoc/>
     protected internal override bool NoWrap => true;
@@ -48,25 +48,24 @@ public sealed class SpinnerColumn : ProgressColumn
         }
     }
 
-        /// <summary>
-        /// Gets or sets the text that should be shown instead
-        /// of the spinner once a task failed.
-        /// </summary>
-        public string? FailedText
+    public string? FailedText
+    {
+        get => _failed;
+        set
         {
-            get => _failed;
-            set
-            {
-                _failed = value;
-                _maxWidth = null;
-            }
+            _failed = value;
+            _maxWidth = null;
         }
+    }
 
-        /// <summary>
-        /// Gets or sets the text that should be shown instead
-        /// of the spinner before a task begins.
-        /// </summary>
-        public string? PendingText
+    /// <summary>
+    /// Gets or sets the text that should be shown instead
+    /// of the spinner before a task begins.
+    /// </summary>
+    public string? PendingText
+    {
+        get => _pending;
+        set
         {
             _pending = value;
             _maxWidth = null;
@@ -78,15 +77,12 @@ public sealed class SpinnerColumn : ProgressColumn
     /// </summary>
     public Style? CompletedStyle { get; set; }
 
-        /// <summary>
-        /// Gets or sets the failed style.
-        /// </summary>
-        public Style? FailedStyle { get; set; }
+    /// <summary>
+    /// Gets or sets the pending style.
+    /// </summary>
+    public Style? PendingStyle { get; set; }
 
-        /// <summary>
-        /// Gets or sets the pending style.
-        /// </summary>
-        public Style? PendingStyle { get; set; }
+    public Style? FailedStyle { get; set; }
 
     /// <summary>
     /// Gets or sets the style of the spinner.
@@ -122,6 +118,11 @@ public sealed class SpinnerColumn : ProgressColumn
             return new Markup(PendingText ?? " ", PendingStyle ?? Style.Plain);
         }
 
+        if (task.IsFailed)
+        {
+            return new Markup(FailedText ?? " ", FailedStyle ?? Style.Plain);
+        }
+
         if (task.IsFinished)
         {
             return new Markup(CompletedText ?? " ", CompletedStyle ?? Style.Plain);
@@ -139,15 +140,11 @@ public sealed class SpinnerColumn : ProgressColumn
         return new Markup(frame.EscapeMarkup(), Style ?? Style.Plain);
     }
 
-            if (task.IsFailed)
-            {
-                return new Markup(FailedText ?? " ", FailedStyle ?? Style.Plain);
-            }
-
-            if (task.IsFinished)
-            {
-                return new Markup(CompletedText ?? " ", CompletedStyle ?? Style.Plain);
-            }
+    /// <inheritdoc/>
+    public override int? GetColumnWidth(RenderContext context)
+    {
+        return GetMaxWidth(context);
+    }
 
     private int GetMaxWidth(RenderContext context)
     {
