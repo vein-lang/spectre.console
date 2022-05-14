@@ -5,6 +5,9 @@ Description: "*Spectre.Console* can display information about long running tasks
 Highlights: 
     - Custom spinner control for running tasks.
     - Fallback for non-interactive consoles such as CI runners.
+Reference:
+    - T:Spectre.Console.Status
+    - M:Spectre.Console.AnsiConsole.Status
 ---
 
 Spectre.Console can display information about long running tasks in the console. 
@@ -43,7 +46,7 @@ AnsiConsole.Status()
     });
 ```
 
-## Asynchronous progress
+## Asynchronous status
 
 If you prefer to use async/await, you can use `StartAsync` instead of `Start`.
 
