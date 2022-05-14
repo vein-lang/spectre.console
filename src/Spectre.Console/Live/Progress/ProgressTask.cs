@@ -147,7 +147,7 @@ public sealed class ProgressTask : IProgress<double>
     /// <summary>
     /// Stops and marks the task as finished.
     /// </summary>
-    public void StopTask()
+    public void StopTask(bool isFailed = false)
     {
         lock (_lock)
         {
@@ -155,6 +155,8 @@ public sealed class ProgressTask : IProgress<double>
             StartTime ??= now;
 
             StopTime = now;
+
+            State.Update<bool>(STATE_TASK_FAILED, (_) => isFailed);
         }
     }
 
