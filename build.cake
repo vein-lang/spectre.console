@@ -17,7 +17,7 @@ Task("Build")
     DotNetBuild("./src/Spectre.Console.sln", new DotNetBuildSettings {
         Configuration = configuration,
         NoIncremental = context.HasArgument("rebuild"),
-        MSBuildSettings = new DotNetCoreMSBuildSettings()
+        MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
     });
 });
@@ -29,7 +29,7 @@ Task("Build-Analyzer")
     DotNetBuild("./src/Spectre.Console.Analyzer.sln", new DotNetBuildSettings {
         Configuration = configuration,
         NoIncremental = context.HasArgument("rebuild"),
-        MSBuildSettings = new DotNetCoreMSBuildSettings()
+        MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
     });
 });
@@ -41,7 +41,7 @@ Task("Build-Examples")
     DotNetBuild("./examples/Examples.sln", new DotNetBuildSettings {
         Configuration = configuration,
         NoIncremental = context.HasArgument("rebuild"),
-        MSBuildSettings = new DotNetCoreMSBuildSettings()
+        MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
     });
 });
@@ -53,6 +53,12 @@ Task("Test")
     .Does(context => 
 {
     DotNetTest("./test/Spectre.Console.Tests/Spectre.Console.Tests.csproj", new DotNetTestSettings {
+        Configuration = configuration,
+        NoRestore = true,
+        NoBuild = true,
+    });
+
+    DotNetTest("./test/Spectre.Console.Cli.Tests/Spectre.Console.Cli.Tests.csproj", new DotNetTestSettings {
         Configuration = configuration,
         NoRestore = true,
         NoBuild = true,
@@ -74,7 +80,7 @@ Task("Package")
         NoRestore = true,
         NoBuild = true,
         OutputDirectory = "./.artifacts",
-        MSBuildSettings = new DotNetCoreMSBuildSettings()
+        MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
     });
 
@@ -83,7 +89,7 @@ Task("Package")
         NoRestore = true,
         NoBuild = true,
         OutputDirectory = "./.artifacts",
-        MSBuildSettings = new DotNetCoreMSBuildSettings()
+        MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
     });
 });

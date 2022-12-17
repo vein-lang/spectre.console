@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <ExampleName>Demo</ExampleName>
     <ExampleDescription>Demonstrates the most common use cases of Spectre.Cli.</ExampleDescription>
@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Spectre.Console\Spectre.Console.csproj" />
+    <ProjectReference Include="..\..\..\src\Spectre.Console.Cli\Spectre.Console.Cli.csproj" />
   </ItemGroup>
 
 </Project>

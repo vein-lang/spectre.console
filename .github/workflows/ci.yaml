@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: Continuous Integration
+name: Pull Request
 on: pull_request
 
 env:
@@ -20,19 +20,15 @@ jobs:
       uses: actions/checkout@master
 
     - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: | 
-          5.0.301
-          6.0.101
+      uses: actions/setup-dotnet@v3
 
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '16'
 
     - name: Cache dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.npm
         key: npm-${{ hashFiles('package-lock.json') }}
@@ -48,7 +44,7 @@ jobs:
         dotnet run --configuration Release
 
     - name: Archive doc generation
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: documentation-output
         path: docs/output/
@@ -74,22 +70,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: | 
-            5.0.301
-            6.0.101
-
-      - name: Integration Tests
-        shell: bash
-        run: |
-          dotnet tool restore
-          dotnet example --all --skip live --skip livetable --skip prompt --skip screens
+        uses: actions/setup-dotnet@v3
 
       - name: Build
         shell: bash
@@ -99,7 +85,7 @@ jobs:
 
       - name: Upload Verify Test Results
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: verify-test-results
           path: |

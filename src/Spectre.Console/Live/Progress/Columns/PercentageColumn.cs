@@ -33,7 +33,7 @@ public sealed class PercentageColumn : ProgressColumn
         }
 
     /// <inheritdoc/>
-    public override int? GetColumnWidth(RenderContext context)
+    public override int? GetColumnWidth(RenderOptions options)
     {
         return 4;
     }
