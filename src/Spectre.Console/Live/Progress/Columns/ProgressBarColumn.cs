@@ -13,12 +13,12 @@ public sealed class ProgressBarColumn : ProgressColumn
     /// <summary>
     /// Gets or sets the style of completed portions of the progress bar.
     /// </summary>
-    public Style CompletedStyle { get; set; } = new Style(foreground: Color.Yellow);
+    public Style CompletedStyle { get; set; } = Color.Yellow;
 
     /// <summary>
     /// Gets or sets the style of a finished progress bar.
     /// </summary>
-    public Style FinishedStyle { get; set; } = new Style(foreground: Color.Green);
+    public Style FinishedStyle { get; set; } = Color.Green;
 
     /// <summary>
     /// Gets or sets the style of a failed progress bar.
@@ -28,7 +28,7 @@ public sealed class ProgressBarColumn : ProgressColumn
     /// <summary>
     /// Gets or sets the style of remaining portions of the progress bar.
     /// </summary>
-    public Style RemainingStyle { get; set; } = new Style(foreground: Color.Grey);
+    public Style RemainingStyle { get; set; } = Color.Grey;
 
     /// <summary>
     /// Gets or sets the style of an indeterminate progress bar.
