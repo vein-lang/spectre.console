@@ -44,4 +44,45 @@ public static class ExceptionExtensions
 
         return ExceptionFormatter.Format(exception, settings);
     }
+
+
+    /// <summary>
+    /// Gets a <see cref="IRenderable"/> representation of the exception.
+    /// </summary>
+    /// <param name="stackTrace">The StackTrace to format.</param>
+    /// <param name="format">The exception format options.</param>
+    /// <returns>A <see cref="IRenderable"/> representing the exception.</returns>
+    public static IRenderable GetRenderable(this StackTrace stackTrace, ExceptionFormats format = ExceptionFormats.Default)
+    {
+        if (stackTrace is null)
+        {
+            throw new ArgumentNullException(nameof(stackTrace));
+        }
+
+        return GetRenderable(stackTrace, new ExceptionSettings
+        {
+            Format = format,
+        });
+    }
+
+    /// <summary>
+    /// Gets a <see cref="IRenderable"/> representation of the exception.
+    /// </summary>
+    /// <param name="exception">The exception to format.</param>
+    /// <param name="settings">The exception settings.</param>
+    /// <returns>A <see cref="IRenderable"/> representing the exception.</returns>
+    public static IRenderable GetRenderable(this StackTrace exception, ExceptionSettings settings)
+    {
+        if (exception is null)
+        {
+            throw new ArgumentNullException(nameof(exception));
+        }
+
+        if (settings is null)
+        {
+            throw new ArgumentNullException(nameof(settings));
+        }
+
+        return ExceptionFormatter.Format(exception, settings);
+    }
 }

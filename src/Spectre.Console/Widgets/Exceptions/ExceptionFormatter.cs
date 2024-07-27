@@ -12,6 +12,26 @@ internal static class ExceptionFormatter
         return GetException(exception, settings);
     }
 
+    public static IRenderable Format(StackTrace stackTrace, ExceptionSettings settings)
+    {
+        if (stackTrace is null)
+        {
+            throw new ArgumentNullException(nameof(stackTrace));
+        }
+
+        return GetStackTrace(stackTrace, settings);
+    }
+
+    private static IRenderable GetStackTrace(StackTrace stackTrace, ExceptionSettings settings)
+    {
+        if (stackTrace is null)
+        {
+            throw new ArgumentNullException(nameof(stackTrace));
+        }
+
+        return new Rows(new Markup("[red]at[/]"), GetStackFrames(stackTrace, settings)).Expand();
+    }
+
     private static IRenderable GetException(Exception exception, ExceptionSettings settings)
     {
         if (exception is null)
@@ -31,6 +51,75 @@ internal static class ExceptionFormatter
 
         var message = $"[{settings.Style.Message.ToMarkup()}]{ex.Message.EscapeMarkup()}[/]";
         return new Markup(string.Concat(type, ": ", message));
+    }
+
+    private static Grid GetStackFrames(StackTrace stackTrace, ExceptionSettings settings)
+    {
+        var styles = settings.Style;
+
+        var grid = new Grid();
+        grid.AddColumn(new GridColumn().PadLeft(2).PadRight(0).NoWrap());
+        grid.AddColumn(new GridColumn().PadLeft(1).PadRight(0));
+        var frames = stackTrace
+            .GetFrames()
+            .FilterStackFrames()
+            .ToList();
+
+        foreach (var frame in frames)
+        {
+            var builder = new StringBuilder();
+
+            // Method
+            var shortenMethods = (settings.Format & ExceptionFormats.ShortenMethods) != 0;
+            var method = frame.GetMethod();
+            if (method == null)
+            {
+                continue;
+            }
+
+            var methodName = GetMethodName(ref method, out var isAsync);
+            if (isAsync)
+            {
+                builder.Append("async ");
+            }
+
+            if (method is MethodInfo mi)
+            {
+                var returnParameter = mi.ReturnParameter;
+                builder.AppendWithStyle(styles.ParameterType, GetParameterName(returnParameter).EscapeMarkup());
+                builder.Append(' ');
+            }
+
+            builder.Append(Emphasize(methodName, new[] { '.' }, styles.Method, shortenMethods, settings));
+            builder.AppendWithStyle(styles.Parenthesis, "(");
+            AppendParameters(builder, method, settings);
+            builder.AppendWithStyle(styles.Parenthesis, ")");
+
+            var path = frame.GetFileName();
+            if (path != null)
+            {
+                builder.Append(' ');
+                builder.AppendWithStyle(styles.Dimmed, "in");
+                builder.Append(' ');
+
+                // Path
+                AppendPath(builder, path, settings);
+
+                // Line number
+                var lineNumber = frame.GetFileLineNumber();
+                if (lineNumber != 0)
+                {
+                    builder.AppendWithStyle(styles.Dimmed, ":");
+                    builder.AppendWithStyle(styles.LineNumber, lineNumber);
+                }
+            }
+
+            grid.AddRow(
+                $"[{styles.Dimmed.ToMarkup()}]at[/]",
+                builder.ToString());
+        }
+
+        return grid;
     }
 
     private static Grid GetStackFrames(Exception ex, ExceptionSettings settings)
