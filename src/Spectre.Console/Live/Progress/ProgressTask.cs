@@ -3,7 +3,7 @@ namespace Spectre.Console;
 /// <summary>
 /// Represents a progress task.
 /// </summary>
-public sealed class ProgressTask : IProgress<double>
+public sealed class ProgressTask : IProgress<double>, IDisposable
 {
     internal const string STATE_TASK_FAILED = "_isFailed_";
     private readonly List<ProgressSample> _samples;
@@ -312,5 +312,13 @@ public sealed class ProgressTask : IProgress<double>
     void IProgress<double>.Report(double value)
     {
         Update(increment: value - Value);
+    }
+
+    public void Dispose()
+    {
+        this.IsIndeterminate(false);
+        this.Value(100);
+        Thread.Sleep(10);
+        StopTask();
     }
 }
