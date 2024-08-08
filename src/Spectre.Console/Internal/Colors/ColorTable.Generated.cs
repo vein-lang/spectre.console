@@ -199,6 +199,7 @@ namespace Spectre.Console
                 { "orchid", 170 },
                 { "mediumorchid1", 171 },
                 { "orange3", 172 },
+                { "orange", 172 },
                 { "lightsalmon3_1", 173 },
                 { "lightpink3", 174 },
                 { "pink3", 175 },
