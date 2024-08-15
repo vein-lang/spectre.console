@@ -14,6 +14,11 @@ public sealed class CommandContext
     public IRemainingArguments Remaining { get; }
 
     /// <summary>
+    /// Gets the arguments.
+    /// </summary>
+    public IReadOnlyList<string> Arguments { get; }
+
+    /// <summary>
     /// Gets the name of the command.
     /// </summary>
     /// <value>
@@ -40,5 +45,19 @@ public sealed class CommandContext
         Remaining = remaining ?? throw new System.ArgumentNullException(nameof(remaining));
         Name = name ?? throw new System.ArgumentNullException(nameof(name));
         Data = data;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CommandContext"/> class.
+    /// </summary>
+    /// <param name="remaining">The remaining arguments.</param>
+    /// <param name="name">The command name.</param>
+    /// <param name="data">The command data.</param>
+    public CommandContext(IRemainingArguments? remaining, string? name, object? data, List<string> args)
+    {
+        Remaining = remaining;
+        Name = name;
+        Data = data;
+        Arguments = args;
     }
 }

@@ -80,7 +80,7 @@ internal sealed class CommandExecutor
             }
 
             // Create the content.
-            var context = new CommandContext(parsedResult.Remaining, leaf.Command.Name, leaf.Command.Data);
+            var context = new CommandContext(parsedResult.Remaining, leaf.Command.Name, leaf.Command.Data, parsedResult.Args);
 
             // Execute the command tree.
             return await Execute(leaf, parsedResult.Tree, context, resolver, configuration).ConfigureAwait(false);
@@ -88,8 +88,9 @@ internal sealed class CommandExecutor
     }
 
 #pragma warning disable CS8603 // Possible null reference return.
-    private CommandTreeParserResult ParseCommandLineArguments(CommandModel model, CommandAppSettings settings, IEnumerable<string> args)
+    private CommandTreeParserResult ParseCommandLineArguments(CommandModel model, CommandAppSettings settings, IEnumerable<string> arguments)
     {
+        var args = arguments.ToList();
         var parser = new CommandTreeParser(model, settings.CaseSensitivity, settings.ParsingMode, settings.ConvertFlagsToRemainingArguments);
 
         var parserContext = new CommandTreeParserContext(args, settings.ParsingMode);
@@ -113,6 +114,12 @@ internal sealed class CommandExecutor
             parsedResult = parser.Parse(parserContext, tokenizerResult);
         }
 
+        if (parsedResult is not null)
+        {
+            parsedResult.Args.Clear();
+            parsedResult.Args.AddRange(args);
+        }
+        
         return parsedResult;
     }
 #pragma warning restore CS8603 // Possible null reference return.

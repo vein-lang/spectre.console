@@ -1,6 +1,6 @@
 namespace Spectre.Console;
 
-internal static class ConsoleHelper
+public static class ConsoleHelper
 {
     public static int GetSafeWidth(int defaultValue = Constants.DefaultTerminalWidth)
     {

@@ -5,6 +5,7 @@ internal sealed class CommandTreeParserResult
 {
     public CommandTree? Tree { get; }
     public IRemainingArguments Remaining { get; }
+    public List<string> Args { get; } = new();
 
     public CommandTreeParserResult(CommandTree? tree, IRemainingArguments remaining)
     {

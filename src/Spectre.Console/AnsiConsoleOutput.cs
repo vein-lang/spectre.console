@@ -3,13 +3,13 @@ namespace Spectre.Console;
 /// <summary>
 /// Represents console output.
 /// </summary>
-public sealed class AnsiConsoleOutput : IAnsiConsoleOutput
+public class AnsiConsoleOutput : IAnsiConsoleOutput
 {
     /// <inheritdoc/>
     public TextWriter Writer { get; }
 
     /// <inheritdoc/>
-    public bool IsTerminal
+    public virtual bool IsTerminal
     {
         get
         {
@@ -28,10 +28,10 @@ public sealed class AnsiConsoleOutput : IAnsiConsoleOutput
     }
 
     /// <inheritdoc/>
-    public int Width => ConsoleHelper.GetSafeWidth(Constants.DefaultTerminalWidth);
+    public virtual int Width => ConsoleHelper.GetSafeWidth(Constants.DefaultTerminalWidth);
 
     /// <inheritdoc/>
-    public int Height => ConsoleHelper.GetSafeHeight(Constants.DefaultTerminalWidth);
+    public virtual int Height => ConsoleHelper.GetSafeHeight(Constants.DefaultTerminalWidth);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AnsiConsoleOutput"/> class.
