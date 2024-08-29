@@ -8,6 +8,9 @@ namespace Spectre.Console.Cli.Help;
 /// </remarks>
 public class HelpProvider : IHelpProvider
 {
+    private readonly HelpProviderResources resources;
+    private readonly HelpProviderStyle? helpStyles;
+
     /// <summary>
     /// Gets a value indicating how many examples from direct children to show in the help text.
     /// </summary>
@@ -23,6 +26,14 @@ public class HelpProvider : IHelpProvider
     /// </summary>
     protected virtual bool TrimTrailingPeriod { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether to emit the markup styles, inline, when rendering the help text.
+    /// </summary>
+    /// <remarks>
+    /// Useful for unit testing different styling of the same help text.
+    /// </remarks>
+    protected virtual bool RenderMarkupInline { get; } = false;
+
     private sealed class HelpArgument
     {
         public string Name { get; }
@@ -30,7 +41,7 @@ public class HelpProvider : IHelpProvider
         public bool Required { get; }
         public string? Description { get; }
 
-        public HelpArgument(string name, int position, bool required, string? description)
+        private HelpArgument(string name, int position, bool required, string? description)
         {
             Name = name;
             Position = position;
@@ -57,7 +68,7 @@ public class HelpProvider : IHelpProvider
         public string? Description { get; }
         public object? DefaultValue { get; }
 
-        public HelpOption(string? @short, string? @long, string? @value, bool? valueIsOptional, string? description, object? defaultValue)
+        private HelpOption(string? @short, string? @long, string? @value, bool? valueIsOptional, string? description, object? defaultValue)
         {
             Short = @short;
             Long = @long;
@@ -67,17 +78,27 @@ public class HelpProvider : IHelpProvider
             DefaultValue = defaultValue;
         }
 
-        public static IReadOnlyList<HelpOption> Get(ICommandInfo? command)
+        public static IReadOnlyList<HelpOption> Get(
+            ICommandModel model,
+            ICommandInfo? command,
+            HelpProviderResources resources)
         {
-            var parameters = new List<HelpOption>();
-            parameters.Add(new HelpOption("h", "help", null, null, "Prints help information", null));
+            var parameters = new List<HelpOption>
+            {
+                new HelpOption("h", "help", null, null, resources.PrintHelpDescription, null),
+            };
 
             // Version information applies to the entire application
             // Include the "-v" option in the help when at the root of the command line application
             // Don't allow the "-v" option if users have specified one or more sub-commands
-            if ((command == null || command?.Parent == null) && !(command?.IsBranch ?? false))
+            if ((command?.Parent == null) && !(command?.IsBranch ?? false))
             {
-                parameters.Add(new HelpOption("v", "version", null, null, "Prints version information", null));
+                // Only show the version command if there is an
+                // application version set.
+                if (model.ApplicationVersion != null)
+                {
+                    parameters.Add(new HelpOption("v", "version", null, null, resources.PrintVersionDescription, null));
+                }
             }
 
             parameters.AddRange(command?.Parameters.OfType<ICommandOption>().Where(o => !o.IsHidden).Select(o =>
@@ -99,6 +120,12 @@ public class HelpProvider : IHelpProvider
         this.ShowOptionDefaultValues = settings.ShowOptionDefaultValues;
         this.MaximumIndirectExamples = settings.MaximumIndirectExamples;
         this.TrimTrailingPeriod = settings.TrimTrailingPeriod;
+
+        // Don't provide a default style if HelpProviderStyles is null,
+        // as the user will have explicitly done this to output unstyled help text
+        this.helpStyles = settings.HelpProviderStyles;
+
+        resources = new HelpProviderResources(settings.Culture);
     }
 
     /// <inheritdoc/>
@@ -142,8 +169,8 @@ public class HelpProvider : IHelpProvider
             yield break;
         }
 
-        var composer = new Composer();
-        composer.Style("yellow", "DESCRIPTION:").LineBreak();
+        var composer = NewComposer();
+        composer.Style(helpStyles?.Description?.Header ?? Style.Plain, $"{resources.Description}:").LineBreak();
         composer.Text(command.Description).LineBreak();
         yield return composer.LineBreak();
     }
@@ -156,16 +183,16 @@ public class HelpProvider : IHelpProvider
     /// <returns>An enumerable collection of <see cref="IRenderable"/> objects.</returns>
     public virtual IEnumerable<IRenderable> GetUsage(ICommandModel model, ICommandInfo? command)
     {
-        var composer = new Composer();
-        composer.Style("yellow", "USAGE:").LineBreak();
+        var composer = NewComposer();
+        composer.Style(helpStyles?.Usage?.Header ?? Style.Plain, $"{resources.Usage}:").LineBreak();
         composer.Tab().Text(model.ApplicationName);
 
-        var parameters = new List<string>();
+        var parameters = new List<Composer>();
 
         if (command == null)
         {
-            parameters.Add("[grey][[OPTIONS]][/]");
-            parameters.Add("[aqua]<COMMAND>[/]");
+            parameters.Add(NewComposer().Style(helpStyles?.Usage?.Options ?? Style.Plain, $"[{resources.Options}]"));
+            parameters.Add(NewComposer().Style(helpStyles?.Usage?.Command ?? Style.Plain, $"<{resources.Command}>"));
         }
         else
         {
@@ -177,11 +204,11 @@ public class HelpProvider : IHelpProvider
                 {
                     if (isCurrent)
                     {
-                        parameters.Add($"[underline]{current.Name.EscapeMarkup()}[/]");
+                        parameters.Add(NewComposer().Style(helpStyles?.Usage?.CurrentCommand ?? Style.Plain, $"{current.Name}"));
                     }
                     else
                     {
-                        parameters.Add($"{current.Name.EscapeMarkup()}");
+                        parameters.Add(NewComposer().Text(current.Name));
                     }
                 }
 
@@ -192,7 +219,7 @@ public class HelpProvider : IHelpProvider
                         foreach (var argument in current.Parameters.OfType<ICommandArgument>()
                             .Where(a => a.Required).OrderBy(a => a.Position).ToArray())
                         {
-                            parameters.Add($"[aqua]<{argument.Value.EscapeMarkup()}>[/]");
+                            parameters.Add(NewComposer().Style(helpStyles?.Usage?.RequiredArgument ?? Style.Plain, $"<{argument.Value}>"));
                         }
                     }
 
@@ -201,27 +228,27 @@ public class HelpProvider : IHelpProvider
                     {
                         foreach (var optionalArgument in optionalArguments)
                         {
-                            parameters.Add($"[silver][[{optionalArgument.Value.EscapeMarkup()}]][/]");
+                            parameters.Add(NewComposer().Style(helpStyles?.Usage?.OptionalArgument ?? Style.Plain, $"[{optionalArgument.Value}]"));
                         }
                     }
                 }
 
                 if (isCurrent)
                 {
-                    parameters.Add("[grey][[OPTIONS]][/]");
+                    parameters.Add(NewComposer().Style(helpStyles?.Usage?.Options ?? Style.Plain, $"[{resources.Options}]"));
                 }
             }
 
             if (command.IsBranch && command.DefaultCommand == null)
             {
                 // The user must specify the command
-                parameters.Add("[aqua]<COMMAND>[/]");
+                parameters.Add(NewComposer().Style(helpStyles?.Usage?.Command ?? Style.Plain, $"<{resources.Command}>"));
             }
             else if (command.IsBranch && command.DefaultCommand != null && command.Commands.Count > 0)
             {
                 // We are on a branch with a default command
                 // The user can optionally specify the command
-                parameters.Add("[aqua][[COMMAND]][/]");
+                parameters.Add(NewComposer().Style(helpStyles?.Usage?.Command ?? Style.Plain, $"[{resources.Command}]"));
             }
             else if (command.IsDefaultCommand)
             {
@@ -231,7 +258,7 @@ public class HelpProvider : IHelpProvider
                 {
                     // Commands other than the default are present
                     // So make these optional in the usage statement
-                    parameters.Add("[aqua][[COMMAND]][/]");
+                    parameters.Add(NewComposer().Style(helpStyles?.Usage?.Command ?? Style.Plain, $"[{resources.Command}]"));
                 }
             }
         }
@@ -239,10 +266,7 @@ public class HelpProvider : IHelpProvider
         composer.Join(" ", parameters);
         composer.LineBreak();
 
-        return new[]
-        {
-            composer,
-        };
+        return new[] { composer };
     }
 
     /// <summary>
@@ -296,14 +320,14 @@ public class HelpProvider : IHelpProvider
 
         if (Math.Min(maxExamples, examples.Count) > 0)
         {
-            var composer = new Composer();
+            var composer = NewComposer();
             composer.LineBreak();
-            composer.Style("yellow", "EXAMPLES:").LineBreak();
+            composer.Style(helpStyles?.Examples?.Header ?? Style.Plain, $"{resources.Examples}:").LineBreak();
 
             for (var index = 0; index < Math.Min(maxExamples, examples.Count); index++)
             {
                 var args = string.Join(" ", examples[index]);
-                composer.Tab().Text(model.ApplicationName).Space().Style("grey", args);
+                composer.Tab().Text(model.ApplicationName).Space().Style(helpStyles?.Examples?.Arguments ?? Style.Plain, args);
                 composer.LineBreak();
             }
 
@@ -328,11 +352,9 @@ public class HelpProvider : IHelpProvider
         }
 
         var result = new List<IRenderable>
-            {
-                new Markup(Environment.NewLine),
-                new Markup("[yellow]ARGUMENTS:[/]"),
-                new Markup(Environment.NewLine),
-            };
+        {
+            NewComposer().LineBreak().Style(helpStyles?.Arguments?.Header ?? Style.Plain, $"{resources.Arguments}:").LineBreak(),
+        };
 
         var grid = new Grid();
         grid.AddColumn(new GridColumn { Padding = new Padding(4, 4), NoWrap = true });
@@ -341,15 +363,15 @@ public class HelpProvider : IHelpProvider
         foreach (var argument in arguments.Where(x => x.Required).OrderBy(x => x.Position))
         {
             grid.AddRow(
-                $"[silver]<{argument.Name.EscapeMarkup()}>[/]",
-                argument.Description?.TrimEnd('.') ?? " ");
+                NewComposer().Style(helpStyles?.Arguments?.RequiredArgument ?? Style.Plain, $"<{argument.Name}>"),
+                NewComposer().Text(argument.Description?.TrimEnd('.') ?? " "));
         }
 
         foreach (var argument in arguments.Where(x => !x.Required).OrderBy(x => x.Position))
         {
             grid.AddRow(
-                $"[grey][[{argument.Name.EscapeMarkup()}]][/]",
-                argument.Description?.TrimEnd('.') ?? " ");
+                NewComposer().Style(helpStyles?.Arguments?.OptionalArgument ?? Style.Plain, $"[{argument.Name}]"),
+                NewComposer().Text(argument.Description?.TrimEnd('.') ?? " "));
         }
 
         result.Add(grid);
@@ -366,18 +388,16 @@ public class HelpProvider : IHelpProvider
     public virtual IEnumerable<IRenderable> GetOptions(ICommandModel model, ICommandInfo? command)
     {
         // Collect all options into a single structure.
-        var parameters = HelpOption.Get(command);
+        var parameters = HelpOption.Get(model, command, resources);
         if (parameters.Count == 0)
         {
             return Array.Empty<IRenderable>();
         }
 
         var result = new List<IRenderable>
-            {
-                new Markup(Environment.NewLine),
-                new Markup("[yellow]OPTIONS:[/]"),
-                new Markup(Environment.NewLine),
-            };
+        {
+            NewComposer().LineBreak().Style(helpStyles?.Options?.Header ?? Style.Plain, $"{resources.Options}:").LineBreak(),
+        };
 
         var helpOptions = parameters.ToArray();
         var defaultValueColumn = ShowOptionDefaultValues && helpOptions.Any(e => e.DefaultValue != null);
@@ -391,71 +411,24 @@ public class HelpProvider : IHelpProvider
 
         grid.AddColumn(new GridColumn { Padding = new Padding(0, 0) });
 
-        static string GetOptionParts(HelpOption option)
-        {
-            var builder = new StringBuilder();
-            if (option.Short != null)
-            {
-                builder.Append('-').Append(option.Short.EscapeMarkup());
-                if (option.Long != null)
-                {
-                    builder.Append(", ");
-                }
-            }
-            else
-            {
-                builder.Append("  ");
-                if (option.Long != null)
-                {
-                    builder.Append("  ");
-                }
-            }
-
-            if (option.Long != null)
-            {
-                builder.Append("--").Append(option.Long.EscapeMarkup());
-            }
-
-            if (option.Value != null)
-            {
-                builder.Append(' ');
-                if (option.ValueIsOptional ?? false)
-                {
-                    builder.Append("[grey][[").Append(option.Value.EscapeMarkup()).Append("]][/]");
-                }
-                else
-                {
-                    builder.Append("[silver]<").Append(option.Value.EscapeMarkup()).Append(">[/]");
-                }
-            }
-
-            return builder.ToString();
-        }
-
         if (defaultValueColumn)
         {
-            grid.AddRow(" ", "[lime]DEFAULT[/]", " ");
+            grid.AddRow(
+                NewComposer().Space(),
+                NewComposer().Style(helpStyles?.Options?.DefaultValueHeader ?? Style.Plain, resources.Default),
+                NewComposer().Space());
         }
 
         foreach (var option in helpOptions)
         {
-            var columns = new List<string> { GetOptionParts(option) };
+            var columns = new List<IRenderable>() { GetOptionParts(option) };
+
             if (defaultValueColumn)
             {
-                static string Bold(object obj) => $"[bold]{obj.ToString().EscapeMarkup()}[/]";
-
-                var defaultValue = option.DefaultValue switch
-                {
-                    null => " ",
-                    "" => " ",
-                    Array { Length: 0 } => " ",
-                    Array array => string.Join(", ", array.Cast<object>().Select(Bold)),
-                    _ => Bold(option.DefaultValue),
-                };
-                columns.Add(defaultValue);
+                columns.Add(GetDefaultValueForOption(option.DefaultValue));
             }
 
-            columns.Add(option.Description?.TrimEnd('.') ?? " ");
+            columns.Add(NewComposer().Text(option.Description?.TrimEnd('.') ?? " "));
 
             grid.AddRow(columns.ToArray());
         }
@@ -485,11 +458,9 @@ public class HelpProvider : IHelpProvider
         }
 
         var result = new List<IRenderable>
-            {
-                new Markup(Environment.NewLine),
-                new Markup("[yellow]COMMANDS:[/]"),
-                new Markup(Environment.NewLine),
-            };
+        {
+            NewComposer().LineBreak().Style(helpStyles?.Commands?.Header ?? Style.Plain, $"{resources.Commands}:").LineBreak(),
+        };
 
         var grid = new Grid();
         grid.AddColumn(new GridColumn { Padding = new Padding(4, 4), NoWrap = true });
@@ -497,27 +468,27 @@ public class HelpProvider : IHelpProvider
 
         foreach (var child in commands)
         {
-            var arguments = new Composer();
-            arguments.Style("silver", child.Name.EscapeMarkup());
+            var arguments = NewComposer();
+            arguments.Style(helpStyles?.Commands?.ChildCommand ?? Style.Plain, child.Name);
             arguments.Space();
 
             foreach (var argument in HelpArgument.Get(child).Where(a => a.Required))
             {
-                arguments.Style("silver", $"<{argument.Name.EscapeMarkup()}>");
+                arguments.Style(helpStyles?.Commands?.RequiredArgument ?? Style.Plain, $"<{argument.Name}>");
                 arguments.Space();
             }
 
             if (TrimTrailingPeriod)
             {
                 grid.AddRow(
-                    arguments.ToString().TrimEnd(),
-                    child.Description?.TrimEnd('.') ?? " ");
+                    NewComposer().Text(arguments.ToString().TrimEnd()),
+                    NewComposer().Text(child.Description?.TrimEnd('.') ?? " "));
             }
             else
             {
                 grid.AddRow(
-                    arguments.ToString().TrimEnd(),
-                    child.Description ?? " ");
+                    NewComposer().Text(arguments.ToString().TrimEnd()),
+                    NewComposer().Text(child.Description ?? " "));
             }
         }
 
@@ -535,5 +506,64 @@ public class HelpProvider : IHelpProvider
     public virtual IEnumerable<IRenderable> GetFooter(ICommandModel model, ICommandInfo? command)
     {
         yield break;
+    }
+
+    private Composer NewComposer()
+    {
+        return new Composer(RenderMarkupInline);
+    }
+
+    private IRenderable GetOptionParts(HelpOption option)
+    {
+        var composer = NewComposer();
+
+        if (option.Short != null)
+        {
+            composer.Text("-").Text(option.Short);
+            if (option.Long != null)
+            {
+                composer.Text(", ");
+            }
+        }
+        else
+        {
+            composer.Text("  ");
+            if (option.Long != null)
+            {
+                composer.Text("  ");
+            }
+        }
+
+        if (option.Long != null)
+        {
+            composer.Text("--").Text(option.Long);
+        }
+
+        if (option.Value != null)
+        {
+            composer.Text(" ");
+            if (option.ValueIsOptional ?? false)
+            {
+                composer.Style(helpStyles?.Options?.OptionalOption ?? Style.Plain, $"[{option.Value}]");
+            }
+            else
+            {
+                composer.Style(helpStyles?.Options?.RequiredOption ?? Style.Plain, $"<{option.Value}>");
+            }
+        }
+
+        return composer;
+    }
+
+    private Composer GetDefaultValueForOption(object? defaultValue)
+    {
+        return defaultValue switch
+        {
+            null => NewComposer().Text(" "),
+            "" => NewComposer().Text(" "),
+            Array { Length: 0 } => NewComposer().Text(" "),
+            Array array => NewComposer().Join(", ", array.Cast<object>().Select(o => NewComposer().Style(helpStyles?.Options?.DefaultValue ?? Style.Plain, o.ToString() ?? string.Empty))),
+            _ => NewComposer().Style(helpStyles?.Options?.DefaultValue ?? Style.Plain, defaultValue?.ToString() ?? string.Empty),
+        };
     }
 }

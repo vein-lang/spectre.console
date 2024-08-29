@@ -14,7 +14,7 @@ public sealed class CommandContext
     public IRemainingArguments Remaining { get; }
 
     /// <summary>
-    /// Gets the arguments.
+    /// Gets all the arguments that were passed to the applicaton.
     /// </summary>
     public IReadOnlyList<string> Arguments { get; }
 
@@ -37,11 +37,17 @@ public sealed class CommandContext
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandContext"/> class.
     /// </summary>
+    /// <param name="arguments">All arguments that were passed to the application.</param>
     /// <param name="remaining">The remaining arguments.</param>
     /// <param name="name">The command name.</param>
     /// <param name="data">The command data.</param>
-    public CommandContext(IRemainingArguments remaining, string name, object? data)
+    public CommandContext(
+        IEnumerable<string> arguments,
+        IRemainingArguments remaining,
+        string name,
+        object? data)
     {
+        Arguments = arguments.ToSafeReadOnlyList();
         Remaining = remaining ?? throw new System.ArgumentNullException(nameof(remaining));
         Name = name ?? throw new System.ArgumentNullException(nameof(name));
         Data = data;

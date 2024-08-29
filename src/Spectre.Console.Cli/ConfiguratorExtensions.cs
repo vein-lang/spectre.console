@@ -42,6 +42,29 @@ public static class ConfiguratorExtensions
     }
 
     /// <summary>
+    /// Sets the culture for the application.
+    /// </summary>
+    /// <param name="configurator">The configurator.</param>
+    /// <param name="culture">The culture.</param>
+    /// <returns>A configurator that can be used to configure the application further.</returns>
+    /// <remarks>
+    /// Text displayed by <see cref="Help.HelpProvider"/> can be localised, but defaults to English.
+    /// Setting the application culture informs the resource manager which culture to use when fetching strings.
+    /// English will be used when a culture has not been specified
+    /// or a string has not been localised for the specified culture.
+    /// </remarks>
+    public static IConfigurator SetApplicationCulture(this IConfigurator configurator, CultureInfo? culture)
+    {
+        if (configurator == null)
+        {
+            throw new ArgumentNullException(nameof(configurator));
+        }
+
+        configurator.Settings.Culture = culture;
+        return configurator;
+    }
+
+    /// <summary>
     /// Sets the name of the application.
     /// </summary>
     /// <param name="configurator">The configurator.</param>
@@ -59,7 +82,7 @@ public static class ConfiguratorExtensions
     }
 
     /// <summary>
-    /// Overrides the auto-detected version of the application.
+    /// Sets the version of the application.
     /// </summary>
     /// <param name="configurator">The configurator.</param>
     /// <param name="version">The version of application.</param>
@@ -72,6 +95,25 @@ public static class ConfiguratorExtensions
         }
 
         configurator.Settings.ApplicationVersion = version;
+        return configurator;
+    }
+
+    /// <summary>
+    /// Uses the version retrieved from the <see cref="AssemblyInformationalVersionAttribute"/>
+    /// as the application's version.
+    /// </summary>
+    /// <param name="configurator">The configurator.</param>
+    /// <returns>A configurator that can be used to configure the application further.</returns>
+    public static IConfigurator UseAssemblyInformationalVersion(this IConfigurator configurator)
+    {
+        if (configurator == null)
+        {
+            throw new ArgumentNullException(nameof(configurator));
+        }
+
+        configurator.Settings.ApplicationVersion =
+            VersionHelper.GetVersion(Assembly.GetEntryAssembly());
+
         return configurator;
     }
 
@@ -206,7 +248,7 @@ public static class ConfiguratorExtensions
             throw new ArgumentNullException(nameof(configurator));
         }
 
-        configurator.Settings.Interceptor = interceptor;
+        configurator.Settings.Registrar.RegisterInstance<ICommandInterceptor>(interceptor);
         return configurator;
     }
 
@@ -301,11 +343,16 @@ public static class ConfiguratorExtensions
     /// <param name="func">The delegate to execute as part of command execution.</param>
     /// <returns>A command configurator that can be used to configure the command further.</returns>
     public static ICommandConfigurator AddDelegate<TSettings>(
-        this IConfigurator<TSettings> configurator,
+        this IConfigurator<TSettings>? configurator,
         string name,
         Func<CommandContext, int> func)
-            where TSettings : CommandSettings
+        where TSettings : CommandSettings
     {
+        if (typeof(TSettings).IsAbstract)
+        {
+            AddDelegate(configurator as IConfigurator<EmptyCommandSettings>, name, func);
+        }
+
         if (configurator == null)
         {
             throw new ArgumentNullException(nameof(configurator));
@@ -344,11 +391,11 @@ public static class ConfiguratorExtensions
     /// <param name="configurator">The configurator.</param>
     /// <param name="exceptionHandler">The Action that handles the exception.</param>
     /// <returns>A configurator that can be used to configure the application further.</returns>
-    public static IConfigurator SetExceptionHandler(this IConfigurator configurator, Action<Exception> exceptionHandler)
+    public static IConfigurator SetExceptionHandler(this IConfigurator configurator, Action<Exception, ITypeResolver?> exceptionHandler)
     {
-        return configurator.SetExceptionHandler(ex =>
+        return configurator.SetExceptionHandler((ex, resolver) =>
         {
-            exceptionHandler(ex);
+            exceptionHandler(ex, resolver);
             return -1;
         });
     }
@@ -359,7 +406,7 @@ public static class ConfiguratorExtensions
     /// <param name="configurator">The configurator.</param>
     /// <param name="exceptionHandler">The Action that handles the exception.</param>
     /// <returns>A configurator that can be used to configure the application further.</returns>
-    public static IConfigurator SetExceptionHandler(this IConfigurator configurator, Func<Exception, int>? exceptionHandler)
+    public static IConfigurator SetExceptionHandler(this IConfigurator configurator, Func<Exception, ITypeResolver?, int>? exceptionHandler)
     {
         if (configurator == null)
         {
