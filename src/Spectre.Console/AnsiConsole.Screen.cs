@@ -13,4 +13,10 @@ public static partial class AnsiConsole
     {
         Console.AlternateScreen(action);
     }
+    /// <summary>
+    /// Switches to an alternate screen buffer if the terminal supports it.
+    /// </summary>
+    /// <param name="action">The action to execute within the alternate screen buffer.</param>
+    public static Task AlternateScreenAsync(Func<Task> action)
+        => Console.AlternateScreen(action);
 }
